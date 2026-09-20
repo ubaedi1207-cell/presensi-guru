@@ -1,112 +1,95 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
 
-  <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
 
-  <title>Presensi Guru</title>
+<title>Scanner Presensi Guru</title>
 
-  <script src="https://unpkg.com/html5-qrcode"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 
-  <style>
+<style>
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f1f5f9;
-    }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f1f5f9;
+}
 
-    .app {
-      max-width: 500px;
-      margin: auto;
-      min-height: 100vh;
-      background: white;
-    }
+.app {
+  max-width: 500px;
+  margin: auto;
+  background: white;
+  min-height: 100vh;
+}
 
-    .header {
-      background: #166534;
-      color: white;
-      text-align: center;
-      padding: 25px 15px;
-    }
+.header {
+  background: #166534;
+  color: white;
+  text-align: center;
+  padding: 22px;
+}
 
-    .header h1 {
-      margin: 0;
-    }
+.header h1 {
+  margin: 0;
+}
 
-    .header p {
-      margin: 8px 0 0;
-    }
+.header p {
+  margin: 7px 0 0;
+}
 
-    .content {
-      padding: 20px;
-    }
+.content {
+  padding: 20px;
+  text-align: center;
+}
 
-    #reader {
-      width: 100%;
-      max-width: 400px;
-      margin: auto;
-    }
+video {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 15px;
+  background: black;
+}
 
-    #hasil {
-      display: none;
-      margin-top: 20px;
-      padding: 20px;
-      border-radius: 15px;
-      text-align: center;
-      background: #f0fdf4;
-      border: 2px solid #22c55e;
-    }
+canvas {
+  display: none;
+}
 
-    #hasil h2 {
-      color: #15803d;
-    }
+#status {
+  margin: 15px 0;
+  padding: 15px;
+  border-radius: 10px;
+  background: #f1f5f9;
+}
 
-    .nama {
-      font-size: 22px;
-      font-weight: bold;
-      margin: 15px 0;
-    }
+#hasil {
+  display: none;
+  padding: 20px;
+  border-radius: 15px;
+  background: #f0fdf4;
+  border: 2px solid #22c55e;
+}
 
-    .status {
-      display: inline-block;
-      padding: 10px 20px;
-      border-radius: 20px;
-      background: #16a34a;
-      color: white;
-      font-weight: bold;
-    }
+.idguru {
+  font-size: 28px;
+  font-weight: bold;
+  margin: 15px;
+}
 
-    .terlambat {
-      background: #dc2626;
-    }
+button {
+  padding: 14px 25px;
+  border: none;
+  border-radius: 10px;
+  background: #166534;
+  color: white;
+  font-size: 16px;
+}
 
-    #pesan {
-      text-align: center;
-      margin: 15px 0;
-      color: #475569;
-    }
-
-    button {
-      display: none;
-      width: 100%;
-      padding: 15px;
-      margin-top: 20px;
-      border: none;
-      border-radius: 10px;
-      background: #166534;
-      color: white;
-      font-size: 16px;
-    }
-
-  </style>
+</style>
 
 </head>
-
 
 <body>
 
@@ -120,47 +103,31 @@
 
   </div>
 
-
   <div class="content">
 
-    <div id="pesan">
-      Arahkan kamera ke QR Code guru
+    <div id="status">
+      Meminta akses kamera...
     </div>
 
-    <div id="reader"></div>
+    <video id="video"
+           autoplay
+           playsinline></video>
 
+    <canvas id="canvas"></canvas>
 
     <div id="hasil">
 
-      <h2>✓ PRESENSI BERHASIL</h2>
+      <h2>QR TERBACA</h2>
 
-      <div class="nama" id="nama"></div>
-
-      <p>
-        ID Guru:
-        <span id="id"></span>
-      </p>
-
-      <p>
-        Tanggal:
-        <span id="tanggal"></span>
-      </p>
-
-      <p>
-        Jam:
-        <span id="jam"></span>
-      </p>
-
-      <div class="status" id="status"></div>
+      <div class="idguru"
+           id="idGuru"></div>
 
     </div>
 
+    <br>
 
-    <button id="scanLagi"
-            onclick="location.reload()">
-
-      SCAN GURU BERIKUTNYA
-
+    <button onclick="mulaiKamera()">
+      📷 Buka Kamera
     </button>
 
   </div>
@@ -170,189 +137,157 @@
 
 <script>
 
-const API_URL =
-"https://script.google.com/macros/s/AKfycby--58s4qJ3QocY3bb7pM_RB9Jm5wb8NDDTBXyEsul733suyFoHjgdOS-XKbbteyAPg/exec";
+const video =
+  document.getElementById("video");
 
+const canvas =
+  document.getElementById("canvas");
 
-let sudahScan = false;
+const ctx =
+  canvas.getContext("2d");
 
+const status =
+  document.getElementById("status");
 
-/* =========================
-   HASIL SCAN
-========================= */
+let stream = null;
 
-function onScanSuccess(decodedText) {
-
-  if (sudahScan) return;
-
-  sudahScan = true;
-
-  document.getElementById("pesan").innerText =
-    "QR berhasil dibaca. Memproses...";
-
-  // Tampilkan ID sementara
-  document.getElementById("id").innerText =
-    decodedText;
-
-  kirimKeServer(decodedText);
-
-}
+let scanning = false;
 
 
 /* =========================
-   KIRIM KE APPS SCRIPT
+   MULAI KAMERA
 ========================= */
 
-function kirimKeServer(idGuru) {
+async function mulaiKamera() {
 
-  const callback =
-    "callback_" + Date.now();
+  try {
 
+    if (stream) {
 
-  window[callback] = function(data) {
-
-    if (data.sukses) {
-
-      tampilkanHasil(data);
-
-    } else {
-
-      document.getElementById("pesan").innerText =
-        "❌ " + data.pesan;
-
-      document.getElementById("scanLagi").style.display =
-        "block";
+      stream.getTracks().forEach(
+        track => track.stop()
+      );
 
     }
 
-    delete window[callback];
+    stream =
+      await navigator.mediaDevices.getUserMedia({
 
-    if (script.parentNode) {
-      script.parentNode.removeChild(script);
-    }
+        video: {
+          facingMode: {
+            ideal: "environment"
+          }
+        },
 
-  };
+        audio: false
 
-
-  const script =
-    document.createElement("script");
-
-
-  script.src =
-    API_URL +
-    "?id=" +
-    encodeURIComponent(idGuru) +
-    "&callback=" +
-    callback;
+      });
 
 
-  script.onerror = function() {
+    video.srcObject = stream;
 
-    document.getElementById("pesan").innerText =
-      "❌ Tidak dapat terhubung ke server.";
+    scanning = true;
 
-    document.getElementById("scanLagi").style.display =
-      "block";
+    status.innerText =
+      "Kamera aktif. Arahkan ke QR Code guru.";
 
-  };
-
-
-  document.body.appendChild(script);
-
-}
-
-
-/* =========================
-   TAMPILKAN HASIL
-========================= */
-
-function tampilkanHasil(data) {
-
-  document.getElementById("reader").style.display =
-    "none";
-
-  document.getElementById("pesan").style.display =
-    "none";
-
-  document.getElementById("hasil").style.display =
-    "block";
-
-
-  document.getElementById("nama").innerText =
-    data.nama;
-
-  document.getElementById("id").innerText =
-    data.id;
-
-  document.getElementById("tanggal").innerText =
-    data.tanggal;
-
-  document.getElementById("jam").innerText =
-    data.jam;
-
-
-  const status =
-    document.getElementById("status");
-
-
-  status.innerText =
-    data.status;
-
-
-  if (data.status === "TERLAMBAT") {
-
-    status.classList.add("terlambat");
+    scanQR();
 
   }
 
+  catch (error) {
 
-  document.getElementById("scanLagi").style.display =
-    "block";
+    status.innerHTML =
+      "❌ Kamera tidak dapat dibuka.<br><br>" +
+      error.name +
+      "<br>" +
+      error.message;
 
-}
-
-
-/* =========================
-   ERROR SCAN
-========================= */
-
-function onScanFailure(error) {
-
-  // Abaikan error ketika QR belum terbaca
+  }
 
 }
 
 
 /* =========================
-   JALANKAN SCANNER
+   SCAN QR
 ========================= */
 
-const scanner =
-  new Html5QrcodeScanner(
+function scanQR() {
 
-    "reader",
+  if (!scanning) return;
 
-    {
-      fps: 10,
+  if (video.readyState === video.HAVE_ENOUGH_DATA) {
 
-      qrbox: {
-        width: 250,
-        height: 250
-      },
+    canvas.width =
+      video.videoWidth;
 
-      rememberLastUsedCamera: true
-
-    },
-
-    false
-
-  );
+    canvas.height =
+      video.videoHeight;
 
 
-scanner.render(
-  onScanSuccess,
-  onScanFailure
-);
+    ctx.drawImage(
+      video,
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+
+    const imageData =
+      ctx.getImageData(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+
+    const code =
+      jsQR(
+        imageData.data,
+        imageData.width,
+        imageData.height
+      );
+
+
+    if (code) {
+
+      scanning = false;
+
+      document.getElementById("idGuru")
+        .innerText = code.data;
+
+      document.getElementById("hasil")
+        .style.display = "block";
+
+      status.innerText =
+        "✅ QR berhasil dibaca";
+
+      if (stream) {
+
+        stream.getTracks().forEach(
+          track => track.stop()
+        );
+
+      }
+
+      return;
+
+    }
+
+  }
+
+  requestAnimationFrame(scanQR);
+
+}
+
+
+/* =========================
+   OTOMATIS MULAI
+========================= */
+
+mulaiKamera();
 
 </script>
 
