@@ -11,10 +11,15 @@
 
 <style>
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: #f1f5f9;
+  background: #eef2f7;
+  color: #1f2937;
 }
 
 .app {
@@ -24,85 +29,226 @@ body {
   min-height: 100vh;
 }
 
+/* =========================
+   HEADER
+========================= */
+
 .header {
-  background: #166534;
+  background: linear-gradient(135deg, #166534, #15803d);
   color: white;
   text-align: center;
-  padding: 22px;
+  padding: 25px 20px;
 }
 
 .header h1 {
   margin: 0;
+  font-size: 28px;
 }
 
 .header p {
-  margin: 7px 0 0;
+  margin: 8px 0 0;
+  font-size: 15px;
+  opacity: 0.95;
 }
+
+/* =========================
+   CONTENT
+========================= */
 
 .content {
   padding: 20px;
   text-align: center;
 }
 
-video {
+#status {
+  margin: 5px 0 18px;
+  padding: 15px;
+  border-radius: 12px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* =========================
+   CAMERA
+========================= */
+
+.camera-box {
+  position: relative;
   width: 100%;
   max-width: 420px;
-  border-radius: 15px;
-  background: black;
+  margin: auto;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #000;
+}
+
+video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+.scan-frame {
+  position: absolute;
+  top: 15%;
+  left: 15%;
+  width: 70%;
+  height: 70%;
+  border: 3px solid #22c55e;
+  border-radius: 18px;
+  pointer-events: none;
+}
+
+.scan-text {
+  position: absolute;
+  bottom: 15px;
+  left: 0;
+  right: 0;
+  color: white;
+  font-size: 14px;
+  text-shadow: 0 1px 3px #000;
+  pointer-events: none;
 }
 
 canvas {
   display: none;
 }
 
-#status {
-  margin: 15px 0;
-  padding: 15px;
-  border-radius: 10px;
-  background: #f1f5f9;
-}
+/* =========================
+   HASIL
+========================= */
 
 #hasil {
   display: none;
-  padding: 20px;
-  border-radius: 15px;
+  margin-top: 15px;
+  padding: 22px 18px;
+  border-radius: 18px;
   background: #f0fdf4;
   border: 2px solid #22c55e;
+}
+
+#hasil.sudah {
+  background: #fff7ed;
+  border-color: #f97316;
+}
+
+.icon-hasil {
+  font-size: 48px;
+  margin-bottom: 5px;
+}
+
+#judulHasil {
+  margin: 5px 0 15px;
+  font-size: 21px;
+  color: #166534;
+}
+
+#hasil.sudah #judulHasil {
+  color: #c2410c;
 }
 
 #nama {
   font-size: 22px;
   font-weight: bold;
   margin: 12px 0;
+  line-height: 1.3;
 }
 
-#idGuru {
-  font-size: 18px;
+.data-row {
+  display: flex;
+  justify-content: space-between;
+  text-align: left;
+  padding: 9px 0;
+  border-bottom: 1px solid #dcfce7;
+  font-size: 15px;
 }
 
-.status {
+.data-row:last-of-type {
+  border-bottom: none;
+}
+
+.data-label {
+  color: #64748b;
+}
+
+.data-value {
+  font-weight: bold;
+  text-align: right;
+  max-width: 60%;
+}
+
+/* =========================
+   STATUS PRESENSI
+========================= */
+
+.status-presensi {
   display: inline-block;
-  margin-top: 10px;
-  padding: 10px 20px;
-  border-radius: 25px;
+  margin-top: 15px;
+  padding: 11px 25px;
+  border-radius: 30px;
   background: #16a34a;
   color: white;
   font-weight: bold;
+  font-size: 17px;
 }
 
-.terlambat {
+.status-presensi.terlambat {
   background: #dc2626;
 }
 
+.status-presensi.sudah {
+  background: #f97316;
+}
+
+/* =========================
+   BUTTON
+========================= */
+
 button {
   width: 100%;
-  padding: 14px;
+  padding: 15px;
   margin-top: 20px;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   background: #166534;
   color: white;
   font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+.footer {
+  padding: 20px;
+  text-align: center;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 400px) {
+
+  .header h1 {
+    font-size: 24px;
+  }
+
+  .content {
+    padding: 15px;
+  }
+
+  #nama {
+    font-size: 20px;
+  }
+
 }
 
 </style>
@@ -113,6 +259,8 @@ button {
 
 <div class="app">
 
+  <!-- HEADER -->
+
   <div class="header">
 
     <h1>Presensi Guru</h1>
@@ -122,59 +270,125 @@ button {
   </div>
 
 
+  <!-- CONTENT -->
+
   <div class="content">
+
+    <!-- STATUS -->
 
     <div id="status">
       Membuka kamera...
     </div>
 
 
-    <video id="video"
-           autoplay
-           playsinline></video>
+    <!-- CAMERA -->
+
+    <div
+      class="camera-box"
+      id="cameraBox">
+
+      <video
+        id="video"
+        autoplay
+        playsinline>
+      </video>
+
+      <div class="scan-frame"></div>
+
+      <div class="scan-text">
+        Arahkan QR Code ke dalam kotak
+      </div>
+
+    </div>
 
 
     <canvas id="canvas"></canvas>
 
 
+    <!-- HASIL -->
+
     <div id="hasil">
 
-      <h2>✓ PRESENSI BERHASIL</h2>
+      <div
+        class="icon-hasil"
+        id="iconHasil">
+        ✓
+      </div>
+
+      <h2 id="judulHasil">
+        PRESENSI BERHASIL
+      </h2>
+
 
       <div id="nama"></div>
 
-      <div>
-        ID Guru:
-        <span id="idGuru"></span>
+
+      <div class="data-row">
+
+        <span class="data-label">
+          ID Guru
+        </span>
+
+        <span
+          class="data-value"
+          id="idGuru">
+        </span>
+
       </div>
 
-      <div>
-        Tanggal:
-        <span id="tanggal"></span>
+
+      <div class="data-row">
+
+        <span class="data-label">
+          Tanggal
+        </span>
+
+        <span
+          class="data-value"
+          id="tanggal">
+        </span>
+
       </div>
 
-      <div>
-        Jam:
-        <span id="jam"></span>
+
+      <div class="data-row">
+
+        <span class="data-label">
+          Jam
+        </span>
+
+        <span
+          class="data-value"
+          id="jam">
+        </span>
+
       </div>
+
 
       <div
-        class="status"
+        class="status-presensi"
         id="statusPresensi">
       </div>
 
     </div>
 
 
+    <!-- BUTTON -->
+
     <button
       id="scanLagi"
       onclick="location.reload()"
       style="display:none;">
 
-      SCAN GURU BERIKUTNYA
+      📷 SCAN GURU BERIKUTNYA
 
     </button>
 
+  </div>
+
+
+  <div class="footer">
+    Sistem Presensi Guru
   </div>
 
 </div>
@@ -182,18 +396,17 @@ button {
 
 <script>
 
-
-/* =========================
+/* ==================================================
    URL APPS SCRIPT
-========================= */
+================================================== */
 
 const API_URL =
 "https://script.google.com/macros/s/AKfycby--58s4qJ3QocY3bb7pM_RB9Jm5wb8NDDTBXyEsul733suyFoHjgdOS-XKbbteyAPg/exec";
 
 
-/* =========================
+/* ==================================================
    ELEMENT
-========================= */
+================================================== */
 
 const video =
 document.getElementById("video");
@@ -207,15 +420,24 @@ canvas.getContext("2d");
 const status =
 document.getElementById("status");
 
+const hasil =
+document.getElementById("hasil");
+
+const cameraBox =
+document.getElementById("cameraBox");
+
+const scanLagi =
+document.getElementById("scanLagi");
+
 
 let stream = null;
 
 let scanning = false;
 
 
-/* =========================
+/* ==================================================
    LOAD jsQR
-========================= */
+================================================== */
 
 const scriptQR =
 document.createElement("script");
@@ -231,12 +453,20 @@ scriptQR.onload = function() {
 };
 
 
+scriptQR.onerror = function() {
+
+  status.innerHTML =
+    "❌ Gagal memuat sistem pemindai QR.";
+
+};
+
+
 document.head.appendChild(scriptQR);
 
 
-/* =========================
+/* ==================================================
    MULAI KAMERA
-========================= */
+================================================== */
 
 async function mulaiKamera() {
 
@@ -261,7 +491,7 @@ async function mulaiKamera() {
     scanning = true;
 
     status.innerText =
-      "Kamera aktif. Arahkan ke QR Code guru.";
+      "Kamera aktif. Arahkan QR Code guru ke dalam kotak.";
 
     scanQR();
 
@@ -271,18 +501,16 @@ async function mulaiKamera() {
 
     status.innerHTML =
       "❌ Kamera tidak dapat dibuka.<br><br>" +
-      error.name +
-      "<br>" +
-      error.message;
+      "Pastikan izin kamera sudah diberikan.";
 
   }
 
 }
 
 
-/* =========================
+/* ==================================================
    SCAN QR
-========================= */
+================================================== */
 
 function scanQR() {
 
@@ -331,7 +559,7 @@ function scanQR() {
       hentikanKamera();
 
       status.innerText =
-        "QR terbaca. Menyimpan presensi...";
+        "QR terbaca. Memproses presensi...";
 
       kirimPresensi(code.data);
 
@@ -347,9 +575,9 @@ function scanQR() {
 }
 
 
-/* =========================
+/* ==================================================
    HENTIKAN KAMERA
-========================= */
+================================================== */
 
 function hentikanKamera() {
 
@@ -359,14 +587,16 @@ function hentikanKamera() {
       track => track.stop()
     );
 
+    stream = null;
+
   }
 
 }
 
 
-/* =========================
+/* ==================================================
    KIRIM PRESENSI
-========================= */
+================================================== */
 
 function kirimPresensi(idGuru) {
 
@@ -382,24 +612,26 @@ function kirimPresensi(idGuru) {
 
     }
 
+    else if (data.sudahPresensi) {
+
+      tampilkanSudahPresensi(data);
+
+    }
+
     else {
 
       status.innerHTML =
-        "❌ " + data.pesan;
+        "❌ " +
+        (data.pesan ||
+        "Presensi gagal.");
 
-      document.getElementById("scanLagi")
-        .style.display = "block";
+      scanLagi.style.display =
+        "block";
 
     }
 
 
     delete window[callback];
-
-    if (script.parentNode) {
-
-      script.parentNode.removeChild(script);
-
-    }
 
   };
 
@@ -413,7 +645,9 @@ function kirimPresensi(idGuru) {
     "?id=" +
     encodeURIComponent(idGuru) +
     "&callback=" +
-    callback;
+    callback +
+    "&t=" +
+    Date.now();
 
 
   script.onerror = function() {
@@ -421,8 +655,8 @@ function kirimPresensi(idGuru) {
     status.innerHTML =
       "❌ Tidak dapat terhubung ke server presensi.";
 
-    document.getElementById("scanLagi")
-      .style.display = "block";
+    scanLagi.style.display =
+      "block";
 
   };
 
@@ -432,38 +666,51 @@ function kirimPresensi(idGuru) {
 }
 
 
-/* =========================
-   HASIL PRESENSI
-========================= */
+/* ==================================================
+   HASIL PRESENSI BERHASIL
+================================================== */
 
 function tampilkanHasil(data) {
 
-  document.getElementById("video")
-    .style.display = "none";
-
+  cameraBox.style.display =
+    "none";
 
   status.style.display =
     "none";
 
+  hasil.style.display =
+    "block";
 
-  document.getElementById("hasil")
-    .style.display = "block";
+  hasil.classList.remove("sudah");
+
+
+  document.getElementById("iconHasil")
+    .innerText = "✓";
+
+
+  document.getElementById("judulHasil")
+    .innerText =
+      "PRESENSI BERHASIL";
 
 
   document.getElementById("nama")
-    .innerText = data.nama;
+    .innerText =
+      data.nama;
 
 
   document.getElementById("idGuru")
-    .innerText = data.id;
+    .innerText =
+      data.id;
 
 
   document.getElementById("tanggal")
-    .innerText = data.tanggal;
+    .innerText =
+      data.tanggal;
 
 
   document.getElementById("jam")
-    .innerText = data.jam;
+    .innerText =
+      data.jam;
 
 
   const statusPresensi =
@@ -472,6 +719,10 @@ function tampilkanHasil(data) {
 
   statusPresensi.innerText =
     data.status;
+
+
+  statusPresensi.className =
+    "status-presensi";
 
 
   if (data.status === "TERLAMBAT") {
@@ -483,8 +734,73 @@ function tampilkanHasil(data) {
   }
 
 
-  document.getElementById("scanLagi")
-    .style.display = "block";
+  scanLagi.style.display =
+    "block";
+
+}
+
+
+/* ==================================================
+   SUDAH PRESENSI
+================================================== */
+
+function tampilkanSudahPresensi(data) {
+
+  cameraBox.style.display =
+    "none";
+
+  status.style.display =
+    "none";
+
+  hasil.style.display =
+    "block";
+
+  hasil.classList.add("sudah");
+
+
+  document.getElementById("iconHasil")
+    .innerText = "⚠️";
+
+
+  document.getElementById("judulHasil")
+    .innerText =
+      "SUDAH PRESENSI HARI INI";
+
+
+  document.getElementById("nama")
+    .innerText =
+      data.nama;
+
+
+  document.getElementById("idGuru")
+    .innerText =
+      data.id;
+
+
+  document.getElementById("tanggal")
+    .innerText =
+      data.tanggal;
+
+
+  document.getElementById("jam")
+    .innerText =
+      data.jam;
+
+
+  const statusPresensi =
+    document.getElementById("statusPresensi");
+
+
+  statusPresensi.innerText =
+    data.status;
+
+
+  statusPresensi.className =
+    "status-presensi sudah";
+
+
+  scanLagi.style.display =
+    "block";
 
 }
 
