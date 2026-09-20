@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Presensi Guru</title>
+
+  <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+    }
+
+    .app {
+      max-width: 500px;
+      min-height: 100vh;
+      margin: auto;
+      background: white;
+    }
+
+    .header {
+      background: #166534;
+      color: white;
+      text-align: center;
+      padding: 25px 15px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .header p {
+      margin: 8px 0 0;
+      font-size: 14px;
+    }
+
+    .content {
+      padding: 20px;
+    }
+
+    #reader {
+      width: 100%;
+      overflow: hidden;
+      border-radius: 15px;
+    }
+
+    .info {
+      text-align: center;
+      color: #64748b;
+      margin: 20px 0;
+    }
+
+    .result {
+      display: none;
+      padding: 20px;
+      border-radius: 15px;
+      background: #dcfce7;
+      text-align: center;
+    }
+
+    .result h2 {
+      margin-top: 0;
+      color: #166534;
+    }
+
+    .guru-id {
+      font-size: 25px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="header">
+    <h1>Presensi Guru</h1>
+    <p>SMK Karya Bangsa Nusantara</p>
+  </div>
+
+  <div class="content">
+
+    <div id="reader"></div>
+
+    <div class="info">
+      Arahkan kamera ke QR Code guru
+    </div>
+
+    <div id="result" class="result">
+      <h2>SCAN BERHASIL</h2>
+
+      <p>ID Guru:</p>
+
+      <div id="guruId" class="guru-id"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+let sudahScan = false;
+
+function onScanSuccess(decodedText) {
+
+  if (sudahScan) return;
+
+  sudahScan = true;
+
+  document.getElementById("guruId").innerText = decodedText;
+
+  document.getElementById("result").style.display = "block";
+
+}
+
+function onScanFailure(error) {
+  // Abaikan error scanning
+}
+
+const scanner = new Html5QrcodeScanner(
+  "reader",
+  {
+    fps: 10,
+    qrbox: {
+      width: 250,
+      height: 250
+    }
+  },
+  false
+);
+
+scanner.render(
+  onScanSuccess,
+  onScanFailure
+);
+
+</script>
+
+</body>
+</html>
