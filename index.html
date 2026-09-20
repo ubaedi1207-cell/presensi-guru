@@ -1,14 +1,19 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
   <title>Presensi Guru</title>
 
   <script src="https://unpkg.com/html5-qrcode"></script>
 
   <style>
+
     * {
       box-sizing: border-box;
     }
@@ -21,8 +26,8 @@
 
     .app {
       max-width: 500px;
-      min-height: 100vh;
       margin: auto;
+      min-height: 100vh;
       background: white;
     }
 
@@ -35,7 +40,7 @@
 
     .header h1 {
       margin: 0;
-      font-size: 24px;
+      font-size: 28px;
     }
 
     .header p {
@@ -49,68 +54,170 @@
 
     #reader {
       width: 100%;
-      overflow: hidden;
-      border-radius: 15px;
+      max-width: 400px;
+      margin: auto;
     }
 
     .info {
       text-align: center;
-      color: #64748b;
       margin: 20px 0;
+      color: #475569;
     }
 
     .result {
       display: none;
+      margin-top: 20px;
       padding: 20px;
       border-radius: 15px;
-      background: #dcfce7;
+      background: #f0fdf4;
+      border: 2px solid #22c55e;
       text-align: center;
     }
 
     .result h2 {
       margin-top: 0;
-      color: #166534;
+      color: #15803d;
     }
 
-    .guru-id {
-      font-size: 25px;
+    .nama {
+      font-size: 22px;
       font-weight: bold;
+      margin: 10px 0;
     }
+
+    .detail {
+      margin: 7px 0;
+      color: #334155;
+    }
+
+    .status {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-weight: bold;
+      color: white;
+      background: #16a34a;
+    }
+
+    .status.terlambat {
+      background: #dc2626;
+    }
+
+    .error {
+      display: none;
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 12px;
+      background: #fef2f2;
+      border: 1px solid #ef4444;
+      color: #b91c1c;
+      text-align: center;
+    }
+
+    button {
+      display: none;
+      width: 100%;
+      margin-top: 20px;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: #166534;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
   </style>
+
 </head>
+
 
 <body>
 
 <div class="app">
 
   <div class="header">
+
     <h1>Presensi Guru</h1>
-    <p>SMK Karya Bangsa Nusantara</p>
+
+    <p>
+      SMK Karya Bangsa Nusantara
+    </p>
+
   </div>
+
 
   <div class="content">
 
     <div id="reader"></div>
 
-    <div class="info">
+    <div class="info" id="info">
+
       Arahkan kamera ke QR Code guru
+
     </div>
 
-    <div id="result" class="result">
-      <h2>SCAN BERHASIL</h2>
 
-      <p>ID Guru:</p>
+    <div class="result" id="result">
 
-      <div id="guruId" class="guru-id"></div>
+      <h2>✓ PRESENSI BERHASIL</h2>
+
+      <div class="nama" id="namaGuru"></div>
+
+      <div class="detail">
+        ID Guru:
+        <span id="idGuru"></span>
+      </div>
+
+      <div class="detail">
+        Tanggal:
+        <span id="tanggal"></span>
+      </div>
+
+      <div class="detail">
+        Jam:
+        <span id="jam"></span>
+      </div>
+
+      <div
+        class="status"
+        id="status">
+      </div>
+
     </div>
+
+
+    <div class="error" id="error"></div>
+
+
+    <button
+      id="scanLagi"
+      onclick="scanLagi()">
+
+      SCAN GURU BERIKUTNYA
+
+    </button>
 
   </div>
 
 </div>
 
+
 <script>
 
+const API_URL =
+"https://script.google.com/macros/s/AKfycby--58s4qJ3QocY3bb7pM_RB9Jm5wb8NDDTBXyEsul733suyFoHjgdOS-XKbbteyAPg/exec";
+
+
 let sudahScan = false;
+
+let scanner;
+
+
+/* =========================
+   HASIL SCAN QR
+========================= */
 
 function onScanSuccess(decodedText) {
 
@@ -118,27 +225,182 @@ function onScanSuccess(decodedText) {
 
   sudahScan = true;
 
-  document.getElementById("guruId").innerText = decodedText;
+  // Hentikan kamera sementara
+  scanner.clear();
 
-  document.getElementById("result").style.display = "block";
+  document.getElementById("info").innerText =
+    "Memproses presensi...";
+
+  kirimPresensi(decodedText);
 
 }
+
 
 function onScanFailure(error) {
-  // Abaikan error scanning
+  // Tidak perlu melakukan apa-apa
 }
 
-const scanner = new Html5QrcodeScanner(
-  "reader",
-  {
-    fps: 10,
-    qrbox: {
-      width: 250,
-      height: 250
+
+/* =========================
+   KIRIM KE GOOGLE SHEETS
+========================= */
+
+function kirimPresensi(idGuru) {
+
+  const callbackName =
+    "presensiCallback_" + Date.now();
+
+
+  window[callbackName] = function(data) {
+
+    // Hapus callback
+    delete window[callbackName];
+
+    if (script.parentNode) {
+      script.parentNode.removeChild(script);
     }
-  },
-  false
-);
+
+
+    if (data.sukses) {
+
+      tampilkanHasil(data);
+
+    } else {
+
+      tampilkanError(data.pesan);
+
+    }
+
+  };
+
+
+  const script =
+    document.createElement("script");
+
+
+  script.src =
+    API_URL +
+    "?id=" +
+    encodeURIComponent(idGuru) +
+    "&callback=" +
+    callbackName;
+
+
+  script.onerror = function() {
+
+    delete window[callbackName];
+
+    tampilkanError(
+      "Tidak dapat terhubung ke server presensi."
+    );
+
+  };
+
+
+  document.body.appendChild(script);
+
+}
+
+
+/* =========================
+   TAMPILKAN HASIL
+========================= */
+
+function tampilkanHasil(data) {
+
+  document.getElementById("info").style.display =
+    "none";
+
+  document.getElementById("result").style.display =
+    "block";
+
+
+  document.getElementById("namaGuru").innerText =
+    data.nama;
+
+  document.getElementById("idGuru").innerText =
+    data.id;
+
+  document.getElementById("tanggal").innerText =
+    data.tanggal;
+
+  document.getElementById("jam").innerText =
+    data.jam;
+
+
+  const status =
+    document.getElementById("status");
+
+
+  status.innerText =
+    data.status;
+
+
+  if (data.status === "TERLAMBAT") {
+
+    status.classList.add("terlambat");
+
+  }
+
+
+  document.getElementById("scanLagi").style.display =
+    "block";
+
+}
+
+
+/* =========================
+   ERROR
+========================= */
+
+function tampilkanError(pesan) {
+
+  const error =
+    document.getElementById("error");
+
+  error.innerText = pesan;
+
+  error.style.display = "block";
+
+  document.getElementById("scanLagi").style.display =
+    "block";
+
+}
+
+
+/* =========================
+   SCAN LAGI
+========================= */
+
+function scanLagi() {
+
+  location.reload();
+
+}
+
+
+/* =========================
+   JALANKAN SCANNER
+========================= */
+
+scanner =
+  new Html5QrcodeScanner(
+
+    "reader",
+
+    {
+      fps: 10,
+
+      qrbox: {
+        width: 250,
+        height: 250
+      }
+    },
+
+    false
+
+  );
+
 
 scanner.render(
   onScanSuccess,
@@ -148,4 +410,5 @@ scanner.render(
 </script>
 
 </body>
+
 </html>
