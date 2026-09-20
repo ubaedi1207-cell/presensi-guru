@@ -1,414 +1,94 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-
   <meta charset="UTF-8">
-
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
-
-  <title>Presensi Guru</title>
-
-  <script src="https://unpkg.com/html5-qrcode"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Kamera</title>
 
   <style>
-
-    * {
-      box-sizing: border-box;
-    }
-
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
-      background: #f1f5f9;
-    }
-
-    .app {
-      max-width: 500px;
-      margin: auto;
-      min-height: 100vh;
-      background: white;
-    }
-
-    .header {
-      background: #166534;
-      color: white;
       text-align: center;
-      padding: 25px 15px;
-    }
-
-    .header h1 {
-      margin: 0;
-      font-size: 28px;
-    }
-
-    .header p {
-      margin: 8px 0 0;
-      font-size: 14px;
-    }
-
-    .content {
       padding: 20px;
     }
 
-    #reader {
+    video {
       width: 100%;
       max-width: 400px;
-      margin: auto;
-    }
-
-    .info {
-      text-align: center;
-      margin: 20px 0;
-      color: #475569;
-    }
-
-    .result {
-      display: none;
       margin-top: 20px;
-      padding: 20px;
       border-radius: 15px;
-      background: #f0fdf4;
-      border: 2px solid #22c55e;
-      text-align: center;
-    }
-
-    .result h2 {
-      margin-top: 0;
-      color: #15803d;
-    }
-
-    .nama {
-      font-size: 22px;
-      font-weight: bold;
-      margin: 10px 0;
-    }
-
-    .detail {
-      margin: 7px 0;
-      color: #334155;
-    }
-
-    .status {
-      display: inline-block;
-      margin-top: 12px;
-      padding: 10px 20px;
-      border-radius: 30px;
-      font-weight: bold;
-      color: white;
-      background: #16a34a;
-    }
-
-    .status.terlambat {
-      background: #dc2626;
-    }
-
-    .error {
-      display: none;
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 12px;
-      background: #fef2f2;
-      border: 1px solid #ef4444;
-      color: #b91c1c;
-      text-align: center;
+      background: black;
     }
 
     button {
-      display: none;
-      width: 100%;
+      padding: 15px 25px;
+      font-size: 18px;
       margin-top: 20px;
-      padding: 14px;
-      border: none;
-      border-radius: 10px;
-      background: #166534;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
     }
 
+    #status {
+      margin-top: 20px;
+      padding: 15px;
+      background: #eee;
+      border-radius: 10px;
+    }
   </style>
-
 </head>
-
 
 <body>
 
-<div class="app">
+<h2>TEST KAMERA PRESENSI</h2>
 
-  <div class="header">
-
-    <h1>Presensi Guru</h1>
-
-    <p>
-      SMK Karya Bangsa Nusantara
-    </p>
-
-  </div>
-
-
-  <div class="content">
-
-    <div id="reader"></div>
-
-    <div class="info" id="info">
-
-      Arahkan kamera ke QR Code guru
-
-    </div>
-
-
-    <div class="result" id="result">
-
-      <h2>✓ PRESENSI BERHASIL</h2>
-
-      <div class="nama" id="namaGuru"></div>
-
-      <div class="detail">
-        ID Guru:
-        <span id="idGuru"></span>
-      </div>
-
-      <div class="detail">
-        Tanggal:
-        <span id="tanggal"></span>
-      </div>
-
-      <div class="detail">
-        Jam:
-        <span id="jam"></span>
-      </div>
-
-      <div
-        class="status"
-        id="status">
-      </div>
-
-    </div>
-
-
-    <div class="error" id="error"></div>
-
-
-    <button
-      id="scanLagi"
-      onclick="scanLagi()">
-
-      SCAN GURU BERIKUTNYA
-
-    </button>
-
-  </div>
-
+<div id="status">
+  Tekan tombol untuk membuka kamera
 </div>
 
+<button onclick="bukaKamera()">
+  📷 BUKA KAMERA
+</button>
+
+<br>
+
+<video id="video" autoplay playsinline></video>
 
 <script>
 
-const API_URL =
-"https://script.google.com/macros/s/AKfycby--58s4qJ3QocY3bb7pM_RB9Jm5wb8NDDTBXyEsul733suyFoHjgdOS-XKbbteyAPg/exec";
-
-
-let sudahScan = false;
-
-let scanner;
-
-
-/* =========================
-   HASIL SCAN QR
-========================= */
-
-function onScanSuccess(decodedText) {
-
-  if (sudahScan) return;
-
-  sudahScan = true;
-
-  // Hentikan kamera sementara
-  scanner.clear();
-
-  document.getElementById("info").innerText =
-    "Memproses presensi...";
-
-  kirimPresensi(decodedText);
-
-}
-
-
-function onScanFailure(error) {
-  // Tidak perlu melakukan apa-apa
-}
-
-
-/* =========================
-   KIRIM KE GOOGLE SHEETS
-========================= */
-
-function kirimPresensi(idGuru) {
-
-  const callbackName =
-    "presensiCallback_" + Date.now();
-
-
-  window[callbackName] = function(data) {
-
-    // Hapus callback
-    delete window[callbackName];
-
-    if (script.parentNode) {
-      script.parentNode.removeChild(script);
-    }
-
-
-    if (data.sukses) {
-
-      tampilkanHasil(data);
-
-    } else {
-
-      tampilkanError(data.pesan);
-
-    }
-
-  };
-
-
-  const script =
-    document.createElement("script");
-
-
-  script.src =
-    API_URL +
-    "?id=" +
-    encodeURIComponent(idGuru) +
-    "&callback=" +
-    callbackName;
-
-
-  script.onerror = function() {
-
-    delete window[callbackName];
-
-    tampilkanError(
-      "Tidak dapat terhubung ke server presensi."
-    );
-
-  };
-
-
-  document.body.appendChild(script);
-
-}
-
-
-/* =========================
-   TAMPILKAN HASIL
-========================= */
-
-function tampilkanHasil(data) {
-
-  document.getElementById("info").style.display =
-    "none";
-
-  document.getElementById("result").style.display =
-    "block";
-
-
-  document.getElementById("namaGuru").innerText =
-    data.nama;
-
-  document.getElementById("idGuru").innerText =
-    data.id;
-
-  document.getElementById("tanggal").innerText =
-    data.tanggal;
-
-  document.getElementById("jam").innerText =
-    data.jam;
-
+async function bukaKamera() {
 
   const status =
     document.getElementById("status");
 
+  const video =
+    document.getElementById("video");
 
-  status.innerText =
-    data.status;
+  try {
 
+    const stream =
+      await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: "environment"
+        },
+        audio: false
+      });
 
-  if (data.status === "TERLAMBAT") {
+    video.srcObject = stream;
 
-    status.classList.add("terlambat");
+    status.innerHTML =
+      "✅ KAMERA BERHASIL DIBUKA";
+
+  } catch (error) {
+
+    status.innerHTML =
+      "❌ KAMERA GAGAL DIBUKA<br><br>" +
+      error.name +
+      "<br>" +
+      error.message;
 
   }
 
-
-  document.getElementById("scanLagi").style.display =
-    "block";
-
 }
-
-
-/* =========================
-   ERROR
-========================= */
-
-function tampilkanError(pesan) {
-
-  const error =
-    document.getElementById("error");
-
-  error.innerText = pesan;
-
-  error.style.display = "block";
-
-  document.getElementById("scanLagi").style.display =
-    "block";
-
-}
-
-
-/* =========================
-   SCAN LAGI
-========================= */
-
-function scanLagi() {
-
-  location.reload();
-
-}
-
-
-/* =========================
-   JALANKAN SCANNER
-========================= */
-
-scanner =
-  new Html5QrcodeScanner(
-
-    "reader",
-
-    {
-      fps: 10,
-
-      qrbox: {
-        width: 250,
-        height: 250
-      }
-    },
-
-    false
-
-  );
-
-
-scanner.render(
-  onScanSuccess,
-  onScanFailure
-);
 
 </script>
 
 </body>
-
 </html>
