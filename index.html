@@ -1,329 +1,832 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Presensi Guru - SMK Karya Bangsa Nusantara</title>
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>
+    Login Admin - Presensi Guru
+  </title>
 
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 
+
   <style>
+
     * {
       box-sizing: border-box;
     }
 
+
     body {
+
       margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: #f1f5f3;
+
+      font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+      background:
+        linear-gradient(
+          135deg,
+          #087f5b,
+          #0ca678
+        );
+
+      min-height: 100vh;
+
       color: #1f2937;
+
     }
+
+
+    /* =================================================
+       LOGIN
+       ================================================= */
+
+    #loginPage {
+
+      min-height: 100vh;
+
+      display: flex;
+
+      justify-content: center;
+
+      align-items: center;
+
+      padding: 20px;
+
+    }
+
+
+    .login-card {
+
+      width: 100%;
+
+      max-width: 400px;
+
+      background: white;
+
+      border-radius: 20px;
+
+      padding: 30px;
+
+      box-shadow:
+        0 15px 40px
+        rgba(0,0,0,0.20);
+
+      text-align: center;
+
+    }
+
+
+    .login-icon {
+
+      font-size: 55px;
+
+      margin-bottom: 10px;
+
+    }
+
+
+    .login-card h1 {
+
+      margin:
+        0 0 8px;
+
+      color: #087f5b;
+
+      font-size: 24px;
+
+    }
+
+
+    .login-card p {
+
+      margin:
+        0 0 25px;
+
+      color: #6b7280;
+
+      font-size: 14px;
+
+    }
+
+
+    .login-input {
+
+      width: 100%;
+
+      padding: 14px;
+
+      margin-bottom: 12px;
+
+      border:
+        1px solid #ced4da;
+
+      border-radius: 10px;
+
+      font-size: 15px;
+
+      outline: none;
+
+    }
+
+
+    .login-input:focus {
+
+      border-color: #087f5b;
+
+    }
+
+
+    .login-button {
+
+      width: 100%;
+
+      border: none;
+
+      background: #087f5b;
+
+      color: white;
+
+      padding: 14px;
+
+      border-radius: 10px;
+
+      font-size: 16px;
+
+      font-weight: bold;
+
+      cursor: pointer;
+
+    }
+
+
+    .login-button:hover {
+
+      background: #066b4d;
+
+    }
+
+
+    .login-message {
+
+      margin-top: 15px;
+
+      padding: 12px;
+
+      border-radius: 10px;
+
+      font-size: 14px;
+
+      display: none;
+
+    }
+
+
+    .login-message.error {
+
+      display: block;
+
+      background: #ffe3e3;
+
+      color: #c92a2a;
+
+    }
+
+
+    .login-message.loading {
+
+      display: block;
+
+      background: #e7f5ff;
+
+      color: #1864ab;
+
+    }
+
+
+    /* =================================================
+       APLIKASI
+       ================================================= */
+
+    #appPage {
+
+      display: none;
+
+      min-height: 100vh;
+
+      background: #f1f5f3;
+
+    }
+
 
     .header {
-      background: linear-gradient(135deg, #087f5b, #0ca678);
+
+      background:
+        linear-gradient(
+          135deg,
+          #087f5b,
+          #0ca678
+        );
+
       color: white;
+
       text-align: center;
-      padding: 24px 16px 28px;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+
+      padding:
+        24px 16px 28px;
+
+      box-shadow:
+        0 3px 12px
+        rgba(0,0,0,0.12);
+
     }
+
 
     .header h1 {
+
       margin: 0;
+
       font-size: 24px;
+
     }
+
 
     .header p {
-      margin: 7px 0 0;
+
+      margin:
+        7px 0 0;
+
       font-size: 14px;
+
     }
+
 
     .clock {
+
       margin-top: 14px;
+
       font-size: 30px;
+
       font-weight: bold;
+
       letter-spacing: 2px;
+
     }
+
 
     .date {
+
       margin-top: 5px;
+
       font-size: 14px;
+
     }
+
+
+    .logout {
+
+      margin-top: 14px;
+
+      background:
+        rgba(255,255,255,0.18);
+
+      color: white;
+
+      border:
+        1px solid
+        rgba(255,255,255,0.5);
+
+      border-radius: 8px;
+
+      padding:
+        8px 16px;
+
+      cursor: pointer;
+
+    }
+
 
     .container {
+
       width: 100%;
+
       max-width: 1000px;
+
       margin: auto;
+
       padding: 18px;
+
     }
+
 
     .menu {
+
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+
+      grid-template-columns:
+        repeat(3, 1fr);
+
       gap: 10px;
+
       margin-bottom: 18px;
+
     }
+
 
     .menu button {
+
       border: none;
+
       border-radius: 12px;
+
       padding: 14px 8px;
+
       font-size: 15px;
+
       font-weight: bold;
+
       cursor: pointer;
+
       background: white;
+
       color: #087f5b;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+
+      box-shadow:
+        0 2px 8px
+        rgba(0,0,0,0.08);
+
     }
+
 
     .menu button.active {
+
       background: #087f5b;
+
       color: white;
+
     }
+
 
     .page {
+
       display: none;
+
     }
+
 
     .page.active {
+
       display: block;
+
     }
+
 
     .card {
+
       background: white;
+
       border-radius: 16px;
+
       padding: 18px;
+
       margin-bottom: 18px;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+
+      box-shadow:
+        0 3px 12px
+        rgba(0,0,0,0.08);
+
     }
 
+
     .card h2 {
+
       margin-top: 0;
+
       color: #087f5b;
+
       font-size: 20px;
+
     }
+
 
     /* DASHBOARD */
 
     .dashboard-grid {
+
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+
+      grid-template-columns:
+        repeat(2, 1fr);
+
       gap: 12px;
+
     }
+
 
     .stat {
+
       background: #f8faf9;
+
       border-radius: 14px;
+
       padding: 18px;
+
       text-align: center;
-      border: 1px solid #e5e7eb;
+
+      border:
+        1px solid #e5e7eb;
+
     }
+
 
     .stat .icon {
+
       font-size: 28px;
+
     }
+
 
     .stat .number {
+
       margin-top: 5px;
+
       font-size: 30px;
+
       font-weight: bold;
+
       color: #087f5b;
+
     }
+
 
     .stat .label {
+
       margin-top: 4px;
+
       font-size: 13px;
+
       color: #6b7280;
+
     }
 
+
     .dashboard-info {
+
       margin-top: 15px;
+
       text-align: center;
+
       font-size: 13px;
+
       color: #6b7280;
+
     }
+
+
+    /* BUTTON */
+
+    .btn {
+
+      width: 100%;
+
+      border: none;
+
+      border-radius: 10px;
+
+      padding: 13px;
+
+      font-size: 15px;
+
+      font-weight: bold;
+
+      cursor: pointer;
+
+      margin-top: 10px;
+
+    }
+
+
+    .btn-green {
+
+      background: #087f5b;
+
+      color: white;
+
+    }
+
+
+    .btn-red {
+
+      background: #e03131;
+
+      color: white;
+
+    }
+
 
     /* SCANNER */
 
     .scanner-box {
+
       position: relative;
+
       width: 100%;
+
       max-width: 500px;
+
       margin: auto;
+
       background: #111;
+
       border-radius: 16px;
+
       overflow: hidden;
+
     }
+
 
     #video {
+
       display: block;
+
       width: 100%;
-      height: auto;
+
     }
+
 
     #canvas {
+
       display: none;
+
     }
+
 
     .scanner-frame {
+
       position: absolute;
+
       width: 60%;
+
       aspect-ratio: 1 / 1;
-      border: 3px solid #20c997;
+
+      border:
+        3px solid #20c997;
+
       border-radius: 15px;
+
       top: 50%;
+
       left: 50%;
-      transform: translate(-50%, -50%);
-      box-shadow: 0 0 0 9999px rgba(0,0,0,0.2);
+
+      transform:
+        translate(-50%, -50%);
+
+      box-shadow:
+        0 0 0 9999px
+        rgba(0,0,0,0.2);
+
     }
+
 
     .scanner-text {
+
       text-align: center;
-      margin: 14px 0 0;
+
+      margin:
+        14px 0 0;
+
       color: #6b7280;
+
       font-size: 14px;
+
     }
 
-    .btn {
-      width: 100%;
-      border: none;
-      border-radius: 10px;
-      padding: 13px;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-
-    .btn-green {
-      background: #087f5b;
-      color: white;
-    }
-
-    .btn-red {
-      background: #e03131;
-      color: white;
-    }
 
     .result {
+
       margin-top: 15px;
+
       padding: 15px;
+
       border-radius: 12px;
+
       display: none;
+
       text-align: center;
+
     }
+
 
     .result.success {
+
       display: block;
+
       background: #d3f9d8;
+
       color: #2b8a3e;
+
     }
+
 
     .result.warning {
+
       display: block;
+
       background: #fff3bf;
+
       color: #e67700;
+
     }
+
 
     .result.error {
+
       display: block;
+
       background: #ffe3e3;
+
       color: #c92a2a;
+
     }
 
+
     .result .big {
+
       font-size: 22px;
+
       font-weight: bold;
+
       margin: 7px 0;
+
     }
+
 
     /* REKAP */
 
     .filter {
+
       display: grid;
-      grid-template-columns: 1fr 1fr;
+
+      grid-template-columns:
+        1fr 1fr;
+
       gap: 10px;
+
     }
+
 
     select {
+
       width: 100%;
+
       padding: 12px;
+
       border-radius: 9px;
-      border: 1px solid #ced4da;
+
+      border:
+        1px solid #ced4da;
+
       font-size: 15px;
+
       background: white;
+
     }
+
 
     .summary {
+
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+
+      grid-template-columns:
+        repeat(5, 1fr);
+
       gap: 8px;
+
       margin: 15px 0;
+
     }
+
 
     .summary-box {
+
       padding: 12px 5px;
+
       text-align: center;
+
       background: #f8f9fa;
+
       border-radius: 10px;
+
     }
+
 
     .summary-box strong {
+
       display: block;
+
       font-size: 22px;
+
       color: #087f5b;
+
     }
+
 
     .summary-box span {
+
       font-size: 11px;
+
       color: #6b7280;
+
     }
+
 
     .table-wrapper {
+
       overflow-x: auto;
+
       margin-top: 15px;
+
     }
+
 
     table {
+
       width: 100%;
+
       border-collapse: collapse;
+
       min-width: 650px;
+
       font-size: 13px;
+
     }
+
 
     th {
+
       background: #087f5b;
+
       color: white;
+
       padding: 10px;
+
       text-align: center;
+
     }
+
 
     td {
-      border-bottom: 1px solid #e9ecef;
+
+      border-bottom:
+        1px solid #e9ecef;
+
       padding: 9px;
+
       text-align: center;
+
     }
+
 
     td:nth-child(2) {
+
       text-align: left;
+
     }
 
-    tr:hover {
-      background: #f8f9fa;
-    }
 
     .loading {
+
       text-align: center;
+
       padding: 20px;
+
       color: #6b7280;
+
     }
 
+
     .footer {
+
       text-align: center;
+
       padding: 20px;
+
       font-size: 12px;
+
       color: #6b7280;
+
     }
+
 
     @media (max-width: 600px) {
 
@@ -344,72 +847,171 @@
       }
 
       .dashboard-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns:
+          repeat(2, 1fr);
       }
 
       .summary {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns:
+          repeat(2, 1fr);
       }
 
       .summary-box:last-child {
         grid-column: span 2;
       }
+
     }
 
-    @media print {
 
-      body {
-        background: white;
-      }
+    @media print {
 
       .menu,
       .btn,
       .footer,
       #dashboardPage,
       #scanPage,
-      .filter {
+      .filter,
+      .logout {
+
         display: none !important;
+
       }
+
 
       #rekapPage {
+
         display: block !important;
+
       }
 
-      .card {
-        box-shadow: none;
-      }
-
-      table {
-        font-size: 11px;
-      }
     }
+
   </style>
+
 </head>
+
 
 <body>
 
+
+<!-- =====================================================
+     LOGIN ADMIN
+     ===================================================== -->
+
+<div id="loginPage">
+
+  <div class="login-card">
+
+    <div class="login-icon">
+      🔐
+    </div>
+
+
+    <h1>
+      LOGIN ADMIN
+    </h1>
+
+
+    <p>
+      Aplikasi Presensi Guru<br>
+      SMK Karya Bangsa Nusantara
+    </p>
+
+
+    <input
+      type="text"
+      id="username"
+      class="login-input"
+      placeholder="Username"
+      autocomplete="username"
+    >
+
+
+    <input
+      type="password"
+      id="password"
+      class="login-input"
+      placeholder="Password"
+      autocomplete="current-password"
+    >
+
+
+    <button
+      class="login-button"
+      onclick="loginAdmin()"
+      id="loginButton"
+    >
+
+      🔓 Masuk sebagai Admin
+
+    </button>
+
+
+    <div
+      id="loginMessage"
+      class="login-message">
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     APLIKASI
+     ===================================================== -->
+
+<div id="appPage">
+
+
   <header class="header">
 
-    <h1>APLIKASI PRESENSI GURU</h1>
+    <h1>
+      APLIKASI PRESENSI GURU
+    </h1>
 
-    <p>SMK Karya Bangsa Nusantara</p>
 
-    <div class="clock" id="clock">
+    <p>
+      SMK Karya Bangsa Nusantara
+    </p>
+
+
+    <div
+      class="clock"
+      id="clock">
+
       00:00:00
+
     </div>
 
-    <div class="date" id="date">
+
+    <div
+      class="date"
+      id="date">
+
       Memuat tanggal...
+
     </div>
+
+
+    <button
+      class="logout"
+      onclick="logout()">
+
+      🚪 Logout
+
+    </button>
 
   </header>
 
 
+
   <main class="container">
 
-    <!-- MENU -->
 
     <div class="menu">
+
 
       <button
         id="btnDashboard"
@@ -438,7 +1040,9 @@
 
       </button>
 
+
     </div>
+
 
 
     <!-- DASHBOARD -->
@@ -446,6 +1050,7 @@
     <section
       id="dashboardPage"
       class="page active">
+
 
       <div class="card">
 
@@ -455,6 +1060,7 @@
 
 
         <div class="dashboard-grid">
+
 
           <div class="stat">
 
@@ -550,6 +1156,7 @@
 
           </div>
 
+
         </div>
 
 
@@ -570,9 +1177,11 @@
 
         </button>
 
+
       </div>
 
     </section>
+
 
 
     <!-- SCAN -->
@@ -580,6 +1189,7 @@
     <section
       id="scanPage"
       class="page">
+
 
       <div class="card">
 
@@ -596,12 +1206,17 @@
             playsinline>
           </video>
 
-          <div class="scanner-frame"></div>
+
+          <div
+            class="scanner-frame">
+          </div>
 
         </div>
 
 
-        <canvas id="canvas"></canvas>
+        <canvas
+          id="canvas">
+        </canvas>
 
 
         <p class="scanner-text">
@@ -638,9 +1253,11 @@
           class="result">
         </div>
 
+
       </div>
 
     </section>
+
 
 
     <!-- REKAP -->
@@ -648,6 +1265,7 @@
     <section
       id="rekapPage"
       class="page">
+
 
       <div class="card">
 
@@ -657,6 +1275,7 @@
 
 
         <div class="filter">
+
 
           <select id="bulan">
 
@@ -711,7 +1330,9 @@
           </select>
 
 
-          <select id="tahun"></select>
+          <select id="tahun">
+          </select>
+
 
         </div>
 
@@ -740,6 +1361,7 @@
 
 
           <div class="summary">
+
 
             <div class="summary-box">
 
@@ -805,12 +1427,15 @@
 
             </div>
 
+
           </div>
 
 
           <div class="table-wrapper">
 
+
             <table>
+
 
               <thead>
 
@@ -853,7 +1478,9 @@
                 id="rekapTable">
               </tbody>
 
+
             </table>
+
 
           </div>
 
@@ -866,11 +1493,14 @@
 
           </button>
 
+
         </div>
+
 
       </div>
 
     </section>
+
 
   </main>
 
@@ -882,539 +1512,944 @@
   </footer>
 
 
+</div>
+
+
+
 <script>
 
-  // ==========================================
-  // URL GOOGLE APPS SCRIPT
-  // ==========================================
 
-  const API_URL =
-    "https://script.google.com/macros/s/AKfycby--58s4qJ3QocY3bb7pM_RB9Jm5wb8NDDTBXyEsul733suyFoHjgdOS-XKbbteyAPg/exec";
+// =====================================================
+// URL GOOGLE APPS SCRIPT
+// =====================================================
 
-
-  // ==========================================
-  // JAM DIGITAL
-  // ==========================================
-
-  function updateClock() {
-
-    const sekarang =
-      new Date();
+const API_URL =
+  "https://script.google.com/macros/s/AKfycby--58s4qJ3QocY3bb7pM_RB9Jm5wb8NDDTBXyEsul733suyFoHjgdOS-XKbbteyAPg/exec";
 
 
-    const jam =
-      String(
-        sekarang.getHours()
-      ).padStart(2, "0");
+// =====================================================
+// LOGIN ADMIN
+// =====================================================
+
+function loginAdmin() {
 
 
-    const menit =
-      String(
-        sekarang.getMinutes()
-      ).padStart(2, "0");
-
-
-    const detik =
-      String(
-        sekarang.getSeconds()
-      ).padStart(2, "0");
-
-
-    document.getElementById(
-      "clock"
-    ).textContent =
-      jam + ":" +
-      menit + ":" +
-      detik;
-
-
-    const namaHari = [
-      "Minggu",
-      "Senin",
-      "Selasa",
-      "Rabu",
-      "Kamis",
-      "Jumat",
-      "Sabtu"
-    ];
-
-
-    const namaBulan = [
-      "Januari",
-      "Februari",
-      "Maret",
-      "April",
-      "Mei",
-      "Juni",
-      "Juli",
-      "Agustus",
-      "September",
-      "Oktober",
-      "November",
-      "Desember"
-    ];
-
-
-    document.getElementById(
-      "date"
-    ).textContent =
-
-      namaHari[
-        sekarang.getDay()
-      ] +
-
-      ", " +
-
-      sekarang.getDate() +
-
-      " " +
-
-      namaBulan[
-        sekarang.getMonth()
-      ] +
-
-      " " +
-
-      sekarang.getFullYear();
-
-  }
-
-
-  updateClock();
-
-  setInterval(
-    updateClock,
-    1000
-  );
-
-
-  // ==========================================
-  // PINDAH HALAMAN
-  // ==========================================
-
-  function showPage(page) {
-
+  const username =
     document
-      .querySelectorAll(".page")
-      .forEach(function(el) {
-
-        el.classList.remove(
-          "active"
-        );
-
-      });
+      .getElementById(
+        "username"
+      )
+      .value
+      .trim();
 
 
+  const password =
     document
-      .querySelectorAll(".menu button")
-      .forEach(function(el) {
-
-        el.classList.remove(
-          "active"
-        );
-
-      });
+      .getElementById(
+        "password"
+      )
+      .value;
 
 
-    if (
-      page === "dashboard"
-    ) {
-
-      document
-        .getElementById(
-          "dashboardPage"
-        )
-        .classList.add(
-          "active"
-        );
+  const message =
+    document.getElementById(
+      "loginMessage"
+    );
 
 
-      document
-        .getElementById(
-          "btnDashboard"
-        )
-        .classList.add(
-          "active"
-        );
+  const button =
+    document.getElementById(
+      "loginButton"
+    );
 
 
-      loadDashboard();
+  if (
+    !username ||
+    !password
+  ) {
 
-    }
+    message.className =
+      "login-message error";
 
+    message.textContent =
+      "Username dan password wajib diisi.";
 
-    else if (
-      page === "scan"
-    ) {
-
-      document
-        .getElementById(
-          "scanPage"
-        )
-        .classList.add(
-          "active"
-        );
-
-
-      document
-        .getElementById(
-          "btnScan"
-        )
-        .classList.add(
-          "active"
-        );
-
-    }
-
-
-    else if (
-      page === "rekap"
-    ) {
-
-      document
-        .getElementById(
-          "rekapPage"
-        )
-        .classList.add(
-          "active"
-        );
-
-
-      document
-        .getElementById(
-          "btnRekap"
-        )
-        .classList.add(
-          "active"
-        );
-
-    }
+    return;
 
   }
 
 
-  // ==========================================
-  // DASHBOARD
-  // ==========================================
+  message.className =
+    "login-message loading";
 
-  function loadDashboard() {
+  message.textContent =
+    "⏳ Memeriksa login...";
 
-    document.getElementById(
-      "dashboardInfo"
-    ).textContent =
-      "⏳ Memuat data...";
 
+  button.disabled =
+    true;
 
-    const callbackName =
-      "dashboardCallback_" +
-      Date.now();
 
+  const callbackName =
+    "loginCallback_" +
+    Date.now();
 
-    window[callbackName] =
-      function(data) {
 
-        if (
-          !data ||
-          !data.sukses
-        ) {
+  window[callbackName] =
+    function(data) {
 
-          document.getElementById(
-            "dashboardInfo"
-          ).textContent =
-            data && data.pesan
-              ? data.pesan
-              : "Gagal mengambil data.";
 
-          return;
+      button.disabled =
+        false;
 
-        }
 
+      if (
+        data &&
+        data.sukses
+      ) {
 
-        document.getElementById(
-          "totalGuru"
-        ).textContent =
-          data.totalGuru;
+        sessionStorage.setItem(
+          "adminLogin",
+          "true"
+        );
 
 
-        document.getElementById(
-          "sudahPresensi"
-        ).textContent =
-          data.sudahPresensi;
+        sessionStorage.setItem(
+          "adminUsername",
+          data.username || username
+        );
 
 
-        document.getElementById(
-          "belumPresensi"
-        ).textContent =
-          data.belumPresensi;
+        message.className =
+          "login-message loading";
 
+        message.textContent =
+          "✅ Login berhasil. Membuka aplikasi...";
 
-        document.getElementById(
-          "jumlahHadir"
-        ).textContent =
-          data.hadir;
 
+        setTimeout(
+          function() {
 
-        document.getElementById(
-          "jumlahTerlambat"
-        ).textContent =
-          data.terlambat;
+            document
+              .getElementById(
+                "loginPage"
+              )
+              .style.display =
+              "none";
 
 
-        document.getElementById(
-          "dashboardInfo"
-        ).textContent =
-          "Data presensi tanggal " +
-          data.tanggal;
+            document
+              .getElementById(
+                "appPage"
+              )
+              .style.display =
+              "block";
 
 
-        delete window[callbackName];
+            loadDashboard();
 
+          },
+          500
+        );
 
-        const script =
-          document.getElementById(
-            callbackName
-          );
-
-
-        if (script) {
-          script.remove();
-        }
-
-      };
-
-
-    const script =
-      document.createElement(
-        "script"
-      );
-
-
-    script.id =
-      callbackName;
-
-
-    script.src =
-      API_URL +
-      "?dashboard=1&callback=" +
-      callbackName;
-
-
-    script.onerror =
-      function() {
-
-        document.getElementById(
-          "dashboardInfo"
-        ).textContent =
-          "❌ Gagal terhubung ke server.";
-
-
-        delete window[
-          callbackName
-        ];
-
-
-        script.remove();
-
-      };
-
-
-    document.body.appendChild(
-      script
-    );
-
-  }
-
-
-  // ==========================================
-  // SCANNER
-  // ==========================================
-
-  let videoStream = null;
-
-  let scanning = false;
-
-  let scanAnimation = null;
-
-  let lastScannedId = "";
-
-  let lastScanTime = 0;
-
-
-  const video =
-    document.getElementById(
-      "video"
-    );
-
-
-  const canvas =
-    document.getElementById(
-      "canvas"
-    );
-
-
-  const context =
-    canvas.getContext(
-      "2d"
-    );
-
-
-  // ==========================================
-  // MULAI KAMERA
-  // ==========================================
-
-  async function startCamera() {
-
-    try {
-
-      if (videoStream) {
-        return;
       }
 
 
-      videoStream =
-        await navigator
-          .mediaDevices
-          .getUserMedia({
+      else {
 
-            video: {
+        message.className =
+          "login-message error";
 
-              facingMode: {
-                ideal: "environment"
-              }
+        message.textContent =
+          data && data.pesan
+            ? data.pesan
+            : "Login gagal.";
 
-            },
-
-            audio: false
-
-          });
+      }
 
 
-      video.srcObject =
-        videoStream;
+      delete window[
+        callbackName
+      ];
 
 
-      scanning = true;
-
-
-      document.getElementById(
-        "startCameraButton"
-      ).style.display =
-        "none";
-
-
-      document.getElementById(
-        "stopCameraButton"
-      ).style.display =
-        "block";
-
-
-      scanAnimation =
-        requestAnimationFrame(
-          scanQR
+      const script =
+        document.getElementById(
+          callbackName
         );
 
-    }
+
+      if (script) {
+        script.remove();
+      }
+
+    };
 
 
-    catch (error) {
+  const script =
+    document.createElement(
+      "script"
+    );
 
-      showResult(
 
-        "error",
+  script.id =
+    callbackName;
 
-        "❌ Kamera tidak dapat digunakan." +
 
-        "<br><br>" +
+  script.src =
+    API_URL +
 
-        "Pastikan izin kamera sudah diberikan."
+    "?action=login" +
 
+    "&username=" +
+
+    encodeURIComponent(
+      username
+    ) +
+
+    "&password=" +
+
+    encodeURIComponent(
+      password
+    ) +
+
+    "&callback=" +
+
+    callbackName;
+
+
+  script.onerror =
+    function() {
+
+      button.disabled =
+        false;
+
+
+      message.className =
+        "login-message error";
+
+
+      message.textContent =
+        "❌ Tidak dapat terhubung ke server.";
+
+
+      delete window[
+        callbackName
+      ];
+
+
+      script.remove();
+
+    };
+
+
+  document.body.appendChild(
+    script
+  );
+
+}
+
+
+
+// =====================================================
+// CEK LOGIN
+// =====================================================
+
+function checkLogin() {
+
+  const sudahLogin =
+    sessionStorage.getItem(
+      "adminLogin"
+    );
+
+
+  if (
+    sudahLogin === "true"
+  ) {
+
+    document
+      .getElementById(
+        "loginPage"
+      )
+      .style.display =
+      "none";
+
+
+    document
+      .getElementById(
+        "appPage"
+      )
+      .style.display =
+      "block";
+
+
+    loadDashboard();
+
+  }
+
+}
+
+
+
+// =====================================================
+// LOGOUT
+// =====================================================
+
+function logout() {
+
+
+  stopCamera();
+
+
+  sessionStorage.removeItem(
+    "adminLogin"
+  );
+
+
+  sessionStorage.removeItem(
+    "adminUsername"
+  );
+
+
+  document
+    .getElementById(
+      "appPage"
+    )
+    .style.display =
+    "none";
+
+
+  document
+    .getElementById(
+      "loginPage"
+    )
+    .style.display =
+    "flex";
+
+
+  document
+    .getElementById(
+      "username"
+    )
+    .value =
+    "";
+
+
+  document
+    .getElementById(
+      "password"
+    )
+    .value =
+    "";
+
+
+  document
+    .getElementById(
+      "loginMessage"
+    ).style.display =
+    "none";
+
+}
+
+
+
+// =====================================================
+// JAM DIGITAL
+// =====================================================
+
+function updateClock() {
+
+
+  const sekarang =
+    new Date();
+
+
+  const jam =
+    String(
+      sekarang.getHours()
+    ).padStart(2, "0");
+
+
+  const menit =
+    String(
+      sekarang.getMinutes()
+    ).padStart(2, "0");
+
+
+  const detik =
+    String(
+      sekarang.getSeconds()
+    ).padStart(2, "0");
+
+
+  document.getElementById(
+    "clock"
+  ).textContent =
+
+    jam +
+    ":" +
+    menit +
+    ":" +
+    detik;
+
+
+  const namaHari = [
+
+    "Minggu",
+    "Senin",
+    "Selasa",
+    "Rabu",
+    "Kamis",
+    "Jumat",
+    "Sabtu"
+
+  ];
+
+
+  const namaBulan = [
+
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember"
+
+  ];
+
+
+  document.getElementById(
+    "date"
+  ).textContent =
+
+    namaHari[
+      sekarang.getDay()
+    ] +
+
+    ", " +
+
+    sekarang.getDate() +
+
+    " " +
+
+    namaBulan[
+      sekarang.getMonth()
+    ] +
+
+    " " +
+
+    sekarang.getFullYear();
+
+}
+
+
+updateClock();
+
+setInterval(
+  updateClock,
+  1000
+);
+
+
+
+// =====================================================
+// PINDAH HALAMAN
+// =====================================================
+
+function showPage(
+  page
+) {
+
+
+  document
+    .querySelectorAll(
+      ".page"
+    )
+    .forEach(
+      function(el) {
+
+        el.classList.remove(
+          "active"
+        );
+
+      }
+    );
+
+
+  document
+    .querySelectorAll(
+      ".menu button"
+    )
+    .forEach(
+      function(el) {
+
+        el.classList.remove(
+          "active"
+        );
+
+      }
+    );
+
+
+  if (
+    page === "dashboard"
+  ) {
+
+
+    document
+      .getElementById(
+        "dashboardPage"
+      )
+      .classList.add(
+        "active"
       );
 
-    }
+
+    document
+      .getElementById(
+        "btnDashboard"
+      )
+      .classList.add(
+        "active"
+      );
+
+
+    loadDashboard();
 
   }
 
 
-  // ==========================================
-  // MATIKAN KAMERA
-  // ==========================================
-
-  function stopCamera() {
-
-    scanning = false;
+  else if (
+    page === "scan"
+  ) {
 
 
-    if (scanAnimation) {
-
-      cancelAnimationFrame(
-        scanAnimation
+    document
+      .getElementById(
+        "scanPage"
+      )
+      .classList.add(
+        "active"
       );
 
-    }
+
+    document
+      .getElementById(
+        "btnScan"
+      )
+      .classList.add(
+        "active"
+      );
+
+  }
 
 
-    if (videoStream) {
+  else if (
+    page === "rekap"
+  ) {
 
-      videoStream
-        .getTracks()
-        .forEach(
-          function(track) {
 
-            track.stop();
+    document
+      .getElementById(
+        "rekapPage"
+      )
+      .classList.add(
+        "active"
+      );
 
-          }
+
+    document
+      .getElementById(
+        "btnRekap"
+      )
+      .classList.add(
+        "active"
+      );
+
+  }
+
+}
+
+
+
+// =====================================================
+// DASHBOARD
+// =====================================================
+
+function loadDashboard() {
+
+
+  document.getElementById(
+    "dashboardInfo"
+  ).textContent =
+    "⏳ Memuat data...";
+
+
+  const callbackName =
+    "dashboardCallback_" +
+    Date.now();
+
+
+  window[callbackName] =
+    function(data) {
+
+
+      if (
+        !data ||
+        !data.sukses
+      ) {
+
+        document.getElementById(
+          "dashboardInfo"
+        ).textContent =
+
+          data && data.pesan
+
+            ? data.pesan
+
+            : "Gagal mengambil data.";
+
+        return;
+
+      }
+
+
+      document.getElementById(
+        "totalGuru"
+      ).textContent =
+        data.totalGuru;
+
+
+      document.getElementById(
+        "sudahPresensi"
+      ).textContent =
+        data.sudahPresensi;
+
+
+      document.getElementById(
+        "belumPresensi"
+      ).textContent =
+        data.belumPresensi;
+
+
+      document.getElementById(
+        "jumlahHadir"
+      ).textContent =
+        data.hadir;
+
+
+      document.getElementById(
+        "jumlahTerlambat"
+      ).textContent =
+        data.terlambat;
+
+
+      document.getElementById(
+        "dashboardInfo"
+      ).textContent =
+
+        "Data presensi tanggal " +
+        data.tanggal;
+
+
+      delete window[
+        callbackName
+      ];
+
+
+      const script =
+        document.getElementById(
+          callbackName
         );
 
 
-      videoStream = null;
+      if (script) {
+        script.remove();
+      }
 
+    };
+
+
+  const script =
+    document.createElement(
+      "script"
+    );
+
+
+  script.id =
+    callbackName;
+
+
+  script.src =
+
+    API_URL +
+
+    "?dashboard=1" +
+
+    "&callback=" +
+
+    callbackName;
+
+
+  script.onerror =
+    function() {
+
+
+      document.getElementById(
+        "dashboardInfo"
+      ).textContent =
+
+        "❌ Gagal terhubung ke server.";
+
+
+      delete window[
+        callbackName
+      ];
+
+
+      script.remove();
+
+    };
+
+
+  document.body.appendChild(
+    script
+  );
+
+}
+
+
+
+// =====================================================
+// SCANNER
+// =====================================================
+
+let videoStream = null;
+
+let scanning = false;
+
+let scanAnimation = null;
+
+let lastScannedId = "";
+
+let lastScanTime = 0;
+
+
+const video =
+  document.getElementById(
+    "video"
+  );
+
+
+const canvas =
+  document.getElementById(
+    "canvas"
+  );
+
+
+const context =
+  canvas.getContext(
+    "2d"
+  );
+
+
+
+// =====================================================
+// MULAI KAMERA
+// =====================================================
+
+async function startCamera() {
+
+
+  try {
+
+
+    if (videoStream) {
+      return;
     }
 
 
-    video.srcObject = null;
+    videoStream =
+      await navigator
+        .mediaDevices
+        .getUserMedia({
+
+          video: {
+
+            facingMode: {
+              ideal: "environment"
+            }
+
+          },
+
+          audio: false
+
+        });
+
+
+    video.srcObject =
+      videoStream;
+
+
+    scanning =
+      true;
 
 
     document.getElementById(
       "startCameraButton"
     ).style.display =
-      "block";
+      "none";
 
 
     document.getElementById(
       "stopCameraButton"
     ).style.display =
-      "none";
+      "block";
+
+
+    scanAnimation =
+      requestAnimationFrame(
+        scanQR
+      );
 
   }
 
 
-  // ==========================================
-  // SCAN QR
-  // ==========================================
-
-  function scanQR() {
-
-    if (!scanning) {
-      return;
-    }
+  catch (error) {
 
 
-    if (
-      video.readyState ===
-      video.HAVE_ENOUGH_DATA
-    ) {
+    showResult(
 
-      canvas.width =
-        video.videoWidth;
+      "error",
+
+      "❌ Kamera tidak dapat digunakan." +
+
+      "<br><br>" +
+
+      "Pastikan izin kamera sudah diberikan."
+
+    );
+
+  }
+
+}
 
 
-      canvas.height =
-        video.videoHeight;
+
+// =====================================================
+// MATIKAN KAMERA
+// =====================================================
+
+function stopCamera() {
 
 
-      context.drawImage(
+  scanning =
+    false;
 
-        video,
+
+  if (
+    scanAnimation
+  ) {
+
+    cancelAnimationFrame(
+      scanAnimation
+    );
+
+  }
+
+
+  if (
+    videoStream
+  ) {
+
+
+    videoStream
+      .getTracks()
+      .forEach(
+        function(track) {
+
+          track.stop();
+
+        }
+      );
+
+
+    videoStream =
+      null;
+
+  }
+
+
+  video.srcObject =
+    null;
+
+
+  document.getElementById(
+    "startCameraButton"
+  ).style.display =
+    "block";
+
+
+  document.getElementById(
+    "stopCameraButton"
+  ).style.display =
+    "none";
+
+}
+
+
+
+// =====================================================
+// SCAN QR
+// =====================================================
+
+function scanQR() {
+
+
+  if (!scanning) {
+    return;
+  }
+
+
+  if (
+
+    video.readyState ===
+    video.HAVE_ENOUGH_DATA
+
+  ) {
+
+
+    canvas.width =
+      video.videoWidth;
+
+
+    canvas.height =
+      video.videoHeight;
+
+
+    context.drawImage(
+
+      video,
+
+      0,
+
+      0,
+
+      canvas.width,
+
+      canvas.height
+
+    );
+
+
+    const imageData =
+      context.getImageData(
 
         0,
 
@@ -1427,797 +2462,830 @@
       );
 
 
-      const imageData =
-        context.getImageData(
+    const code =
+      jsQR(
 
-          0,
+        imageData.data,
 
-          0,
+        imageData.width,
 
-          canvas.width,
+        imageData.height,
 
-          canvas.height
+        {
 
-        );
-
-
-      const code =
-        jsQR(
-
-          imageData.data,
-
-          imageData.width,
-
-          imageData.height,
-
-          {
-            inversionAttempts:
-              "dontInvert"
-          }
-
-        );
-
-
-      if (
-        code &&
-        code.data
-      ) {
-
-        const idGuru =
-          String(
-            code.data
-          ).trim();
-
-
-        const sekarang =
-          Date.now();
-
-
-        if (
-
-          idGuru ===
-          lastScannedId &&
-
-          sekarang -
-          lastScanTime <
-          5000
-
-        ) {
-
-          scanAnimation =
-            requestAnimationFrame(
-              scanQR
-            );
-
-          return;
+          inversionAttempts:
+            "dontInvert"
 
         }
 
-
-        lastScannedId =
-          idGuru;
+      );
 
 
-        lastScanTime =
-          sekarang;
+    if (
+      code &&
+      code.data
+    ) {
 
 
-        prosesPresensi(
-          idGuru
-        );
+      const idGuru =
+        String(
+          code.data
+        ).trim();
+
+
+      const sekarang =
+        Date.now();
+
+
+      if (
+
+        idGuru ===
+        lastScannedId &&
+
+        sekarang -
+        lastScanTime <
+        5000
+
+      ) {
+
+
+        scanAnimation =
+          requestAnimationFrame(
+            scanQR
+          );
+
+
+        return;
 
       }
 
-    }
+
+      lastScannedId =
+        idGuru;
 
 
-    scanAnimation =
-      requestAnimationFrame(
-        scanQR
+      lastScanTime =
+        sekarang;
+
+
+      prosesPresensi(
+        idGuru
       );
+
+    }
 
   }
 
 
-  // ==========================================
-  // PROSES PRESENSI
-  // ==========================================
-
-  function prosesPresensi(
-    idGuru
-  ) {
-
-    showResult(
-
-      "success",
-
-      "⏳ Memproses presensi..."
-
+  scanAnimation =
+    requestAnimationFrame(
+      scanQR
     );
 
-
-    const callbackName =
-      "presensiCallback_" +
-      Date.now();
+}
 
 
-    window[callbackName] =
-      function(data) {
+
+// =====================================================
+// PROSES PRESENSI
+// =====================================================
+
+function prosesPresensi(
+  idGuru
+) {
+
+
+  showResult(
+
+    "success",
+
+    "⏳ Memproses presensi..."
+
+  );
+
+
+  const callbackName =
+    "presensiCallback_" +
+    Date.now();
+
+
+  window[callbackName] =
+    function(data) {
+
+
+      if (
+        data.sukses
+      ) {
+
+
+        let kelas =
+          "success";
+
 
         if (
-          data.sukses
+
+          String(
+            data.status
+          ).toUpperCase() ===
+          "TERLAMBAT"
+
         ) {
 
-          let kelas =
-            "success";
-
-
-          if (
-
-            String(
-              data.status
-            ).toUpperCase() ===
-            "TERLAMBAT"
-
-          ) {
-
-            kelas =
-              "warning";
-
-          }
-
-
-          showResult(
-
-            kelas,
-
-            "✅ PRESENSI BERHASIL" +
-
-            "<div class='big'>" +
-
-            escapeHtml(
-              data.nama
-            ) +
-
-            "</div>" +
-
-            "Tanggal: " +
-
-            escapeHtml(
-              data.tanggal
-            ) +
-
-            "<br>" +
-
-            "Jam: " +
-
-            escapeHtml(
-              data.jam
-            ) +
-
-            "<br>" +
-
-            "Status: <strong>" +
-
-            escapeHtml(
-              data.status
-            ) +
-
-            "</strong>"
-
-          );
+          kelas =
+            "warning";
 
         }
 
 
-        else if (
-          data.sudahPresensi
-        ) {
+        showResult(
 
-          showResult(
+          kelas,
 
-            "warning",
+          "✅ PRESENSI BERHASIL" +
 
-            "⚠️ SUDAH PRESENSI" +
+          "<div class='big'>" +
 
-            "<div class='big'>" +
+          escapeHtml(
+            data.nama
+          ) +
 
-            escapeHtml(
-              data.nama || ""
-            ) +
+          "</div>" +
 
-            "</div>" +
+          "Tanggal: " +
 
-            escapeHtml(
-              data.pesan || ""
-            ) +
+          escapeHtml(
+            data.tanggal
+          ) +
 
-            "<br><br>" +
+          "<br>" +
 
-            "Jam: " +
+          "Jam: " +
 
-            escapeHtml(
-              data.jam || ""
-            ) +
+          escapeHtml(
+            data.jam
+          ) +
 
-            "<br>" +
+          "<br>" +
 
-            "Status: <strong>" +
+          "Status: <strong>" +
 
-            escapeHtml(
-              data.status || ""
-            ) +
+          escapeHtml(
+            data.status
+          ) +
 
-            "</strong>"
+          "</strong>"
 
-          );
+        );
 
-        }
+      }
 
 
-        else {
-
-          showResult(
-
-            "error",
-
-            "❌ PRESENSI GAGAL" +
-
-            "<br><br>" +
-
-            escapeHtml(
-
-              data.pesan ||
-
-              "Data guru tidak ditemukan."
-
-            )
-
-          );
-
-        }
+      else if (
+        data.sudahPresensi
+      ) {
 
 
-        delete window[
-          callbackName
-        ];
+        showResult(
+
+          "warning",
+
+          "⚠️ SUDAH PRESENSI" +
+
+          "<div class='big'>" +
+
+          escapeHtml(
+            data.nama || ""
+          ) +
+
+          "</div>" +
+
+          escapeHtml(
+            data.pesan || ""
+          ) +
+
+          "<br><br>" +
+
+          "Jam: " +
+
+          escapeHtml(
+            data.jam || ""
+          ) +
+
+          "<br>" +
+
+          "Status: <strong>" +
+
+          escapeHtml(
+            data.status || ""
+          ) +
+
+          "</strong>"
+
+        );
+
+      }
 
 
-        const script =
-          document.getElementById(
-            callbackName
-          );
+      else {
 
-
-        if (script) {
-          script.remove();
-        }
-
-      };
-
-
-    const script =
-      document.createElement(
-        "script"
-      );
-
-
-    script.id =
-      callbackName;
-
-
-    script.src =
-      API_URL +
-
-      "?id=" +
-
-      encodeURIComponent(
-        idGuru
-      ) +
-
-      "&callback=" +
-
-      callbackName;
-
-
-    script.onerror =
-      function() {
 
         showResult(
 
           "error",
 
-          "❌ Gagal terhubung ke server."
+          "❌ PRESENSI GAGAL" +
+
+          "<br><br>" +
+
+          escapeHtml(
+
+            data.pesan ||
+
+            "Data guru tidak ditemukan."
+
+          )
 
         );
 
+      }
 
-        delete window[
+
+      delete window[
+        callbackName
+      ];
+
+
+      const script =
+        document.getElementById(
           callbackName
-        ];
+        );
 
 
+      if (script) {
         script.remove();
+      }
 
-      };
+    };
 
 
-    document.body.appendChild(
-      script
+  const script =
+    document.createElement(
+      "script"
     );
 
-  }
+
+  script.id =
+    callbackName;
 
 
-  // ==========================================
-  // HASIL SCAN
-  // ==========================================
+  script.src =
 
-  function showResult(
-    type,
-    html
-  ) {
+    API_URL +
 
-    const result =
-      document.getElementById(
-        "result"
+    "?id=" +
+
+    encodeURIComponent(
+      idGuru
+    ) +
+
+    "&callback=" +
+
+    callbackName;
+
+
+  script.onerror =
+    function() {
+
+
+      showResult(
+
+        "error",
+
+        "❌ Gagal terhubung ke server."
+
       );
 
 
-    result.className =
-      "result " + type;
+      delete window[
+        callbackName
+      ];
 
 
-    result.innerHTML =
-      html;
+      script.remove();
+
+    };
 
 
-    result.style.display =
-      "block";
+  document.body.appendChild(
+    script
+  );
 
-  }
-
-
-  // ==========================================
-  // REKAP
-  // ==========================================
-
-  function loadRekap() {
-
-    const bulan =
-      document.getElementById(
-        "bulan"
-      ).value;
+}
 
 
-    const tahun =
-      document.getElementById(
-        "tahun"
-      ).value;
+
+// =====================================================
+// HASIL SCAN
+// =====================================================
+
+function showResult(
+  type,
+  html
+) {
 
 
+  const result =
     document.getElementById(
-      "rekapContent"
-    ).style.display =
-      "none";
+      "result"
+    );
 
 
+  result.className =
+    "result " + type;
+
+
+  result.innerHTML =
+    html;
+
+
+  result.style.display =
+    "block";
+
+}
+
+
+
+// =====================================================
+// REKAP
+// =====================================================
+
+function loadRekap() {
+
+
+  const bulan =
     document.getElementById(
-      "rekapLoading"
-    ).style.display =
-      "block";
+      "bulan"
+    ).value;
 
 
+  const tahun =
     document.getElementById(
-      "rekapLoading"
-    ).textContent =
-      "⏳ Memuat rekap...";
+      "tahun"
+    ).value;
 
 
-    const callbackName =
-      "rekapCallback_" +
-      Date.now();
+  document.getElementById(
+    "rekapContent"
+  ).style.display =
+    "none";
 
 
-    window[callbackName] =
-      function(data) {
-
-        if (
-          !data ||
-          !data.sukses
-        ) {
-
-          document.getElementById(
-            "rekapLoading"
-          ).textContent =
-
-            data && data.pesan
-
-              ? data.pesan
-
-              : "Gagal mengambil rekap.";
-
-          return;
-
-        }
+  document.getElementById(
+    "rekapLoading"
+  ).style.display =
+    "block";
 
 
-        tampilkanRekap(
-          data.data
-        );
+  document.getElementById(
+    "rekapLoading"
+  ).textContent =
+    "⏳ Memuat rekap...";
 
 
-        delete window[
-          callbackName
-        ];
+  const callbackName =
+    "rekapCallback_" +
+    Date.now();
 
 
-        const script =
-          document.getElementById(
-            callbackName
-          );
+  window[callbackName] =
+    function(data) {
 
 
-        if (script) {
-          script.remove();
-        }
+      if (
+        !data ||
+        !data.sukses
+      ) {
 
-      };
-
-
-    const script =
-      document.createElement(
-        "script"
-      );
-
-
-    script.id =
-      callbackName;
-
-
-    script.src =
-
-      API_URL +
-
-      "?bulan=" +
-
-      encodeURIComponent(
-        bulan
-      ) +
-
-      "&tahun=" +
-
-      encodeURIComponent(
-        tahun
-      ) +
-
-      "&callback=" +
-
-      callbackName;
-
-
-    script.onerror =
-      function() {
 
         document.getElementById(
           "rekapLoading"
         ).textContent =
-          "❌ Gagal terhubung ke server.";
+
+          data && data.pesan
+
+            ? data.pesan
+
+            : "Gagal mengambil rekap.";
 
 
-        delete window[
-          callbackName
-        ];
+        return;
+
+      }
 
 
-        script.remove();
-
-      };
-
-
-    document.body.appendChild(
-      script
-    );
-
-  }
-
-
-  // ==========================================
-  // TAMPILKAN REKAP
-  // ==========================================
-
-  function tampilkanRekap(
-    data
-  ) {
-
-    const tbody =
-      document.getElementById(
-        "rekapTable"
+      tampilkanRekap(
+        data.data
       );
 
 
-    tbody.innerHTML = "";
+      delete window[
+        callbackName
+      ];
 
 
-    let totalHadir = 0;
-
-    let totalTerlambat = 0;
-
-    let totalIzin = 0;
-
-    let totalSakit = 0;
-
-    let totalAlpa = 0;
-
-
-    data.forEach(
-      function(guru, index) {
-
-        const tr =
-          document.createElement(
-            "tr"
-          );
-
-
-        tr.innerHTML =
-
-          "<td>" +
-
-          (index + 1) +
-
-          "</td>" +
-
-          "<td>" +
-
-          escapeHtml(
-            guru.nama
-          ) +
-
-          "</td>" +
-
-          "<td>" +
-
-          guru.hadir +
-
-          "</td>" +
-
-          "<td>" +
-
-          guru.terlambat +
-
-          "</td>" +
-
-          "<td>" +
-
-          guru.izin +
-
-          "</td>" +
-
-          "<td>" +
-
-          guru.sakit +
-
-          "</td>" +
-
-          "<td>" +
-
-          guru.alpa +
-
-          "</td>";
-
-
-        tbody.appendChild(
-          tr
+      const script =
+        document.getElementById(
+          callbackName
         );
 
 
-        totalHadir +=
-          Number(
-            guru.hadir
-          ) || 0;
-
-
-        totalTerlambat +=
-          Number(
-            guru.terlambat
-          ) || 0;
-
-
-        totalIzin +=
-          Number(
-            guru.izin
-          ) || 0;
-
-
-        totalSakit +=
-          Number(
-            guru.sakit
-          ) || 0;
-
-
-        totalAlpa +=
-          Number(
-            guru.alpa
-          ) || 0;
-
+      if (script) {
+        script.remove();
       }
+
+    };
+
+
+  const script =
+    document.createElement(
+      "script"
     );
 
 
-    document.getElementById(
-      "totalHadir"
-    ).textContent =
-      totalHadir;
+  script.id =
+    callbackName;
 
 
-    document.getElementById(
-      "totalTerlambat"
-    ).textContent =
-      totalTerlambat;
+  script.src =
+
+    API_URL +
+
+    "?bulan=" +
+
+    encodeURIComponent(
+      bulan
+    ) +
+
+    "&tahun=" +
+
+    encodeURIComponent(
+      tahun
+    ) +
+
+    "&callback=" +
+
+    callbackName;
 
 
-    document.getElementById(
-      "totalIzin"
-    ).textContent =
-      totalIzin;
+  script.onerror =
+    function() {
 
 
-    document.getElementById(
-      "totalSakit"
-    ).textContent =
-      totalSakit;
-
-
-    document.getElementById(
-      "totalAlpa"
-    ).textContent =
-      totalAlpa;
-
-
-    document.getElementById(
-      "rekapLoading"
-    ).style.display =
-      "none";
-
-
-    document.getElementById(
-      "rekapContent"
-    ).style.display =
-      "block";
-
-  }
-
-
-  // ==========================================
-  // KEAMANAN HTML
-  // ==========================================
-
-  function escapeHtml(
-    value
-  ) {
-
-    return String(
-      value ?? ""
-    )
-
-      .replace(
-        /&/g,
-        "&amp;"
-      )
-
-      .replace(
-        /</g,
-        "&lt;"
-      )
-
-      .replace(
-        />/g,
-        "&gt;"
-      )
-
-      .replace(
-        /"/g,
-        "&quot;"
-      )
-
-      .replace(
-        /'/g,
-        "&#039;"
-      );
-
-  }
-
-
-  // ==========================================
-  // TAHUN
-  // ==========================================
-
-  function isiTahun() {
-
-    const select =
       document.getElementById(
-        "tahun"
-      );
+        "rekapLoading"
+      ).textContent =
+        "❌ Gagal terhubung ke server.";
 
 
-    const tahunSekarang =
-      new Date()
-        .getFullYear();
+      delete window[
+        callbackName
+      ];
 
 
-    for (
+      script.remove();
 
-      let tahun =
-        tahunSekarang - 2;
+    };
 
-      tahun <=
-        tahunSekarang + 1;
 
-      tahun++
+  document.body.appendChild(
+    script
+  );
 
+}
+
+
+
+// =====================================================
+// TAMPILKAN REKAP
+// =====================================================
+
+function tampilkanRekap(
+  data
+) {
+
+
+  const tbody =
+    document.getElementById(
+      "rekapTable"
+    );
+
+
+  tbody.innerHTML =
+    "";
+
+
+  let totalHadir =
+    0;
+
+
+  let totalTerlambat =
+    0;
+
+
+  let totalIzin =
+    0;
+
+
+  let totalSakit =
+    0;
+
+
+  let totalAlpa =
+    0;
+
+
+  data.forEach(
+    function(
+      guru,
+      index
     ) {
 
-      const option =
+
+      const tr =
         document.createElement(
-          "option"
+          "tr"
         );
 
 
-      option.value =
-        tahun;
+      tr.innerHTML =
+
+        "<td>" +
+
+        (index + 1) +
+
+        "</td>" +
+
+        "<td>" +
+
+        escapeHtml(
+          guru.nama
+        ) +
+
+        "</td>" +
+
+        "<td>" +
+
+        guru.hadir +
+
+        "</td>" +
+
+        "<td>" +
+
+        guru.terlambat +
+
+        "</td>" +
+
+        "<td>" +
+
+        guru.izin +
+
+        "</td>" +
+
+        "<td>" +
+
+        guru.sakit +
+
+        "</td>" +
+
+        "<td>" +
+
+        guru.alpa +
+
+        "</td>";
 
 
-      option.textContent =
-        tahun;
-
-
-      if (
-        tahun ===
-        tahunSekarang
-      ) {
-
-        option.selected =
-          true;
-
-      }
-
-
-      select.appendChild(
-        option
+      tbody.appendChild(
+        tr
       );
+
+
+      totalHadir +=
+        Number(
+          guru.hadir
+        ) || 0;
+
+
+      totalTerlambat +=
+        Number(
+          guru.terlambat
+        ) || 0;
+
+
+      totalIzin +=
+        Number(
+          guru.izin
+        ) || 0;
+
+
+      totalSakit +=
+        Number(
+          guru.sakit
+        ) || 0;
+
+
+      totalAlpa +=
+        Number(
+          guru.alpa
+        ) || 0;
+
+    }
+  );
+
+
+  document.getElementById(
+    "totalHadir"
+  ).textContent =
+    totalHadir;
+
+
+  document.getElementById(
+    "totalTerlambat"
+  ).textContent =
+    totalTerlambat;
+
+
+  document.getElementById(
+    "totalIzin"
+  ).textContent =
+    totalIzin;
+
+
+  document.getElementById(
+    "totalSakit"
+  ).textContent =
+    totalSakit;
+
+
+  document.getElementById(
+    "totalAlpa"
+  ).textContent =
+    totalAlpa;
+
+
+  document.getElementById(
+    "rekapLoading"
+  ).style.display =
+    "none";
+
+
+  document.getElementById(
+    "rekapContent"
+  ).style.display =
+    "block";
+
+}
+
+
+
+// =====================================================
+// ESCAPE HTML
+// =====================================================
+
+function escapeHtml(
+  value
+) {
+
+
+  return String(
+    value ?? ""
+  )
+
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+
+    .replace(
+      /</g,
+      "&lt;"
+    )
+
+    .replace(
+      />/g,
+      "&gt;"
+    )
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+
+// =====================================================
+// TAHUN
+// =====================================================
+
+function isiTahun() {
+
+
+  const select =
+    document.getElementById(
+      "tahun"
+    );
+
+
+  const tahunSekarang =
+    new Date()
+      .getFullYear();
+
+
+  for (
+
+    let tahun =
+      tahunSekarang - 2;
+
+    tahun <=
+      tahunSekarang + 1;
+
+    tahun++
+
+  ) {
+
+
+    const option =
+      document.createElement(
+        "option"
+      );
+
+
+    option.value =
+      tahun;
+
+
+    option.textContent =
+      tahun;
+
+
+    if (
+      tahun ===
+      tahunSekarang
+    ) {
+
+      option.selected =
+        true;
 
     }
 
-  }
 
-
-  // ==========================================
-  // BULAN SEKARANG
-  // ==========================================
-
-  function setBulanSekarang() {
-
-    document.getElementById(
-      "bulan"
-    ).value =
-
-      new Date()
-        .getMonth() + 1;
+    select.appendChild(
+      option
+    );
 
   }
 
+}
 
-  // ==========================================
-  // MULAI APLIKASI
-  // ==========================================
 
-  isiTahun();
 
-  setBulanSekarang();
+// =====================================================
+// BULAN SEKARANG
+// =====================================================
 
-  loadDashboard();
+function setBulanSekarang() {
+
+
+  document.getElementById(
+    "bulan"
+  ).value =
+
+    new Date()
+      .getMonth() + 1;
+
+}
+
+
+
+// =====================================================
+// INIT
+// =====================================================
+
+isiTahun();
+
+setBulanSekarang();
+
+checkLogin();
+
 
 </script>
 
 </body>
+
 </html>
