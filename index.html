@@ -1,768 +1,872 @@
+```html
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Presensi Guru</title>
-
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
-
-<style>
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f3f7f4;
-  color: #1f2937;
-}
-
-/* =========================================
-   HEADER
-========================================= */
-
-.header {
-  background: linear-gradient(135deg, #087f5b, #16a085);
-  color: white;
-  padding: 22px 15px;
-  text-align: center;
-}
-
-.header h1 {
-  margin: 0;
-  font-size: 25px;
-}
-
-.header p {
-  margin: 6px 0 0;
-  font-size: 14px;
-  opacity: 0.95;
-}
-
-
-/* =========================================
-   MENU UTAMA
-========================================= */
-
-.menu {
-  display: flex;
-  gap: 10px;
-  max-width: 700px;
-  margin: 18px auto 0;
-  padding: 0 15px;
-}
-
-.menu button {
-  flex: 1;
-  border: none;
-  padding: 13px 10px;
-  border-radius: 10px;
-  background: white;
-  color: #087f5b;
-  font-size: 15px;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-
-.menu button.active {
-  background: #087f5b;
-  color: white;
-}
-
-
-/* =========================================
-   HALAMAN
-========================================= */
-
-.page {
-  display: none;
-  max-width: 700px;
-  margin: 15px auto;
-  padding: 0 15px 30px;
-}
-
-.page.active {
-  display: block;
-}
-
-
-/* =========================================
-   SCANNER
-========================================= */
-
-.camera-card {
-  background: white;
-  border-radius: 15px;
-  padding: 15px;
-  box-shadow: 0 3px 12px rgba(0,0,0,0.08);
-}
-
-.camera-title {
-  text-align: center;
-  font-weight: bold;
-  margin-bottom: 12px;
-}
-
-.camera-box {
-  position: relative;
-  width: 100%;
-  max-width: 500px;
-  margin: auto;
-  background: black;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-#video {
-  display: block;
-  width: 100%;
-}
-
-#canvas {
-  display: none;
-}
-
-.scan-frame {
-  position: absolute;
-  width: 60%;
-  aspect-ratio: 1 / 1;
-  border: 3px solid #00ff88;
-  border-radius: 15px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.scan-text {
-  text-align: center;
-  margin-top: 12px;
-  font-size: 14px;
-  color: #666;
-}
-
-
-/* =========================================
-   HASIL PRESENSI
-========================================= */
-
-.result {
-  display: none;
-  margin-top: 15px;
-  background: white;
-  border-radius: 15px;
-  padding: 18px;
-  text-align: center;
-  box-shadow: 0 3px 12px rgba(0,0,0,0.08);
-}
-
-.result.success {
-  border-top: 5px solid #087f5b;
-}
-
-.result.warning {
-  border-top: 5px solid #f39c12;
-}
-
-.result h2 {
-  margin-top: 0;
-}
-
-.result-name {
-  font-size: 19px;
-  font-weight: bold;
-  margin: 8px 0;
-}
-
-.result-info {
-  font-size: 14px;
-  line-height: 1.8;
-}
-
-.status {
-  display: inline-block;
-  padding: 7px 15px;
-  border-radius: 20px;
-  margin-top: 8px;
-  font-weight: bold;
-}
-
-.status.hadir {
-  background: #d8f3dc;
-  color: #087f5b;
-}
-
-.status.terlambat {
-  background: #fff0d6;
-  color: #d97706;
-}
-
-.next-button {
-  margin-top: 15px;
-  width: 100%;
-  border: none;
-  padding: 12px;
-  border-radius: 10px;
-  background: #087f5b;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-
-/* =========================================
-   REKAP
-========================================= */
-
-.rekap-card {
-  background: white;
-  border-radius: 15px;
-  padding: 18px;
-  box-shadow: 0 3px 12px rgba(0,0,0,0.08);
-}
-
-.rekap-card h2 {
-  text-align: center;
-  margin-top: 0;
-  color: #087f5b;
-}
-
-
-/* FILTER */
-
-.filter {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 18px;
-}
-
-.filter select,
-.filter input {
-  flex: 1;
-  padding: 11px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 14px;
-}
-
-.filter button {
-  padding: 11px 16px;
-  border: none;
-  border-radius: 8px;
-  background: #087f5b;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-
-/* RINGKASAN */
-
-.summary {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 7px;
-  margin-bottom: 18px;
-}
-
-.summary-box {
-  background: #f5f5f5;
-  border-radius: 9px;
-  padding: 9px 5px;
-  text-align: center;
-}
-
-.summary-box strong {
-  display: block;
-  font-size: 20px;
-}
-
-.summary-box span {
-  font-size: 11px;
-}
-
-
-/* TABEL */
-
-.table-wrapper {
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 650px;
-}
-
-th,
-td {
-  padding: 10px 8px;
-  border-bottom: 1px solid #eee;
-  text-align: center;
-  font-size: 13px;
-}
-
-th {
-  background: #087f5b;
-  color: white;
-}
-
-td:nth-child(2) {
-  text-align: left;
-}
-
-.loading {
-  text-align: center;
-  padding: 20px;
-  color: #666;
-}
-
-.error {
-  background: #ffe5e5;
-  color: #b91c1c;
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  display: none;
-}
-
-
-/* =========================================
-   CETAK
-========================================= */
-
-.print-button {
-  margin-top: 15px;
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 9px;
-  background: #374151;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-
-/* =========================================
-   MOBILE
-========================================= */
-
-@media (max-width: 600px) {
-
-  .header h1 {
-    font-size: 21px;
-  }
-
-  .menu button {
-    font-size: 13px;
-  }
-
-  .filter {
-    flex-wrap: wrap;
-  }
-
-  .filter button {
-    width: 100%;
-  }
-
-  .summary {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-}
-
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Presensi Guru - SMK Karya Bangsa Nusantara</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f1f5f3;
+      color: #1f2937;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #087f5b, #0ca678);
+      color: white;
+      text-align: center;
+      padding: 24px 16px 28px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .header p {
+      margin: 7px 0 0;
+      font-size: 14px;
+      opacity: 0.95;
+    }
+
+    .clock {
+      margin-top: 14px;
+      font-size: 30px;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    .date {
+      margin-top: 5px;
+      font-size: 14px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1000px;
+      margin: auto;
+      padding: 18px;
+    }
+
+    .menu {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .menu button {
+      border: none;
+      border-radius: 12px;
+      padding: 15px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      background: white;
+      color: #087f5b;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .menu button.active {
+      background: #087f5b;
+      color: white;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+    }
+
+    .card h2 {
+      margin-top: 0;
+      color: #087f5b;
+      font-size: 20px;
+    }
+
+    /* DASHBOARD */
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .stat {
+      background: #f8faf9;
+      border-radius: 14px;
+      padding: 18px;
+      text-align: center;
+      border: 1px solid #e5e7eb;
+    }
+
+    .stat .icon {
+      font-size: 28px;
+    }
+
+    .stat .number {
+      margin-top: 5px;
+      font-size: 30px;
+      font-weight: bold;
+      color: #087f5b;
+    }
+
+    .stat .label {
+      margin-top: 4px;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .dashboard-info {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    /* SCANNER */
+
+    .scanner-box {
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+      margin: auto;
+      background: #111;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    #video {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    #canvas {
+      display: none;
+    }
+
+    .scanner-frame {
+      position: absolute;
+      width: 60%;
+      aspect-ratio: 1 / 1;
+      border: 3px solid #20c997;
+      border-radius: 15px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 0 9999px rgba(0,0,0,0.2);
+    }
+
+    .scanner-text {
+      text-align: center;
+      margin: 14px 0 0;
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      padding: 13px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .btn-green {
+      background: #087f5b;
+      color: white;
+    }
+
+    .btn-red {
+      background: #e03131;
+      color: white;
+    }
+
+    .result {
+      margin-top: 15px;
+      padding: 15px;
+      border-radius: 12px;
+      display: none;
+      text-align: center;
+    }
+
+    .result.success {
+      display: block;
+      background: #d3f9d8;
+      color: #2b8a3e;
+    }
+
+    .result.warning {
+      display: block;
+      background: #fff3bf;
+      color: #e67700;
+    }
+
+    .result.error {
+      display: block;
+      background: #ffe3e3;
+      color: #c92a2a;
+    }
+
+    .result .big {
+      font-size: 25px;
+      font-weight: bold;
+      margin: 5px 0;
+    }
+
+    /* REKAP */
+
+    .filter {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 9px;
+      border: 1px solid #ced4da;
+      font-size: 15px;
+      background: white;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin: 15px 0;
+    }
+
+    .summary-box {
+      padding: 12px 5px;
+      text-align: center;
+      background: #f8f9fa;
+      border-radius: 10px;
+    }
+
+    .summary-box strong {
+      display: block;
+      font-size: 22px;
+      color: #087f5b;
+    }
+
+    .summary-box span {
+      font-size: 11px;
+      color: #6b7280;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      margin-top: 15px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 650px;
+      font-size: 13px;
+    }
+
+    th {
+      background: #087f5b;
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
+
+    td {
+      border-bottom: 1px solid #e9ecef;
+      padding: 9px;
+      text-align: center;
+    }
+
+    td:nth-child(2) {
+      text-align: left;
+    }
+
+    tr:hover {
+      background: #f8f9fa;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #6b7280;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    @media (max-width: 600px) {
+
+      .header h1 {
+        font-size: 20px;
+      }
+
+      .clock {
+        font-size: 26px;
+      }
+
+      .container {
+        padding: 12px;
+      }
+
+      .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .summary {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .summary-box:last-child {
+        grid-column: span 2;
+      }
+    }
+  </style>
 </head>
-
 
 <body>
 
-
-<!-- ========================================
-     HEADER
-======================================== -->
-
-<div class="header">
-
-  <h1>📋 PRESENSI GURU</h1>
-
-  <p>SMK Karya Bangsa Nusantara</p>
-
-</div>
-
-
-<!-- ========================================
-     MENU
-======================================== -->
-
-<div class="menu">
-
-  <button
-    id="btnScan"
-    class="active"
-    onclick="showPage('scan')">
-
-    📷 Scan Presensi
-
-  </button>
-
-
-  <button
-    id="btnRekap"
-    onclick="showPage('rekap')">
-
-    📊 Rekap Bulanan
-
-  </button>
-
-</div>
-
-
-<!-- ========================================
-     HALAMAN SCAN
-======================================== -->
-
-<div
-  id="scanPage"
-  class="page active">
-
-
-  <div class="camera-card">
-
-    <div class="camera-title">
-      Arahkan kamera ke QR Code Guru
-    </div>
-
-
-    <div class="camera-box">
-
-      <video
-        id="video"
-        autoplay
-        playsinline>
-      </video>
-
-
-      <canvas
-        id="canvas">
-      </canvas>
-
-
-      <div class="scan-frame"></div>
-
-    </div>
-
-
-    <div class="scan-text">
-      Pastikan QR Code berada di dalam kotak
-    </div>
-
-  </div>
-
-
-  <!-- HASIL -->
-
-  <div
-    id="result"
-    class="result">
-
-    <h2 id="resultTitle">
-      PRESENSI BERHASIL
-    </h2>
-
-
-    <div
-      id="resultName"
-      class="result-name">
-    </div>
-
-
-    <div
-      id="resultInfo"
-      class="result-info">
-    </div>
-
-
-    <div
-      id="resultStatus"
-      class="status">
-    </div>
-
-
-    <button
-      class="next-button"
-      onclick="location.reload()">
-
-      🔄 Scan Berikutnya
-
-    </button>
-
-  </div>
-
-</div>
-
-
-<!-- ========================================
-     HALAMAN REKAP
-======================================== -->
-
-<div
-  id="rekapPage"
-  class="page">
-
-
-  <div class="rekap-card">
-
-    <h2>📊 Rekap Presensi Bulanan</h2>
-
-
-    <!-- ERROR -->
-
-    <div
-      id="rekapError"
-      class="error">
-    </div>
-
-
-    <!-- FILTER -->
-
-    <div class="filter">
-
-      <select id="bulan">
-
-        <option value="1">Januari</option>
-        <option value="2">Februari</option>
-        <option value="3">Maret</option>
-        <option value="4">April</option>
-        <option value="5">Mei</option>
-        <option value="6">Juni</option>
-        <option value="7">Juli</option>
-        <option value="8">Agustus</option>
-        <option value="9">September</option>
-        <option value="10">Oktober</option>
-        <option value="11">November</option>
-        <option value="12">Desember</option>
-
-      </select>
-
-
-      <input
-        type="number"
-        id="tahun"
-        min="2020"
-        max="2100">
-
-
-      <button onclick="loadRekap()">
-        Tampilkan
+  <header class="header">
+    <h1>APLIKASI PRESENSI GURU</h1>
+    <p>SMK Karya Bangsa Nusantara</p>
+
+    <div class="clock" id="clock">00:00:00</div>
+    <div class="date" id="date">Memuat tanggal...</div>
+  </header>
+
+  <main class="container">
+
+    <!-- MENU -->
+    <div class="menu">
+      <button id="btnDashboard" class="active" onclick="showPage('dashboard')">
+        📊 Dashboard
       </button>
 
+      <button id="btnScan" onclick="showPage('scan')">
+        📷 Scan Presensi
+      </button>
+
+      <button id="btnRekap" onclick="showPage('rekap')">
+        📋 Rekap Bulanan
+      </button>
     </div>
 
 
-    <!-- RINGKASAN -->
+    <!-- ========================= -->
+    <!-- DASHBOARD -->
+    <!-- ========================= -->
 
-    <div
-      id="summary"
-      class="summary"
-      style="display:none;">
+    <section id="dashboardPage" class="page active">
 
-      <div class="summary-box">
-        <strong id="totalHadir">0</strong>
-        <span>Hadir</span>
+      <div class="card">
+
+        <h2>📊 Dashboard Hari Ini</h2>
+
+        <div class="dashboard-grid">
+
+          <div class="stat">
+            <div class="icon">👨‍🏫</div>
+            <div class="number" id="totalGuru">-</div>
+            <div class="label">Total Guru</div>
+          </div>
+
+          <div class="stat">
+            <div class="icon">✅</div>
+            <div class="number" id="sudahPresensi">-</div>
+            <div class="label">Sudah Presensi</div>
+          </div>
+
+          <div class="stat">
+            <div class="icon">⏳</div>
+            <div class="number" id="belumPresensi">-</div>
+            <div class="label">Belum Presensi</div>
+          </div>
+
+          <div class="stat">
+            <div class="icon">🟢</div>
+            <div class="number" id="jumlahHadir">-</div>
+            <div class="label">Hadir</div>
+          </div>
+
+          <div class="stat">
+            <div class="icon">🟠</div>
+            <div class="number" id="jumlahTerlambat">-</div>
+            <div class="label">Terlambat</div>
+          </div>
+
+        </div>
+
+        <div class="dashboard-info" id="dashboardInfo">
+          Memuat data dashboard...
+        </div>
+
+        <button class="btn btn-green" onclick="loadDashboard()">
+          🔄 Perbarui Dashboard
+        </button>
+
       </div>
 
-      <div class="summary-box">
-        <strong id="totalTerlambat">0</strong>
-        <span>Terlambat</span>
+    </section>
+
+
+    <!-- ========================= -->
+    <!-- SCAN PRESENSI -->
+    <!-- ========================= -->
+
+    <section id="scanPage" class="page">
+
+      <div class="card">
+
+        <h2>📷 Scan Presensi Guru</h2>
+
+        <div class="scanner-box">
+
+          <video id="video" autoplay playsinline></video>
+
+          <div class="scanner-frame"></div>
+
+        </div>
+
+        <canvas id="canvas"></canvas>
+
+        <p class="scanner-text">
+          Arahkan kamera ke QR Code kartu presensi guru.
+        </p>
+
+        <button
+          id="startCameraButton"
+          class="btn btn-green"
+          onclick="startCamera()">
+          📷 Mulai Kamera
+        </button>
+
+        <button
+          id="stopCameraButton"
+          class="btn btn-red"
+          onclick="stopCamera()"
+          style="display:none;">
+          ⛔ Matikan Kamera
+        </button>
+
+        <div id="result" class="result"></div>
+
       </div>
 
-      <div class="summary-box">
-        <strong id="totalIzin">0</strong>
-        <span>Izin</span>
+    </section>
+
+
+    <!-- ========================= -->
+    <!-- REKAP BULANAN -->
+    <!-- ========================= -->
+
+    <section id="rekapPage" class="page">
+
+      <div class="card">
+
+        <h2>📋 Rekap Presensi Bulanan</h2>
+
+        <div class="filter">
+
+          <select id="bulan">
+            <option value="1">Januari</option>
+            <option value="2">Februari</option>
+            <option value="3">Maret</option>
+            <option value="4">April</option>
+            <option value="5">Mei</option>
+            <option value="6">Juni</option>
+            <option value="7">Juli</option>
+            <option value="8">Agustus</option>
+            <option value="9">September</option>
+            <option value="10">Oktober</option>
+            <option value="11">November</option>
+            <option value="12">Desember</option>
+          </select>
+
+          <select id="tahun"></select>
+
+        </div>
+
+        <button class="btn btn-green" onclick="loadRekap()">
+          🔍 Tampilkan Rekap
+        </button>
+
+        <div id="rekapLoading" class="loading">
+          Silakan pilih bulan dan tahun.
+        </div>
+
+        <div id="rekapContent" style="display:none;">
+
+          <div class="summary">
+
+            <div class="summary-box">
+              <strong id="totalHadir">0</strong>
+              <span>HADIR</span>
+            </div>
+
+            <div class="summary-box">
+              <strong id="totalTerlambat">0</strong>
+              <span>TERLAMBAT</span>
+            </div>
+
+            <div class="summary-box">
+              <strong id="totalIzin">0</strong>
+              <span>IZIN</span>
+            </div>
+
+            <div class="summary-box">
+              <strong id="totalSakit">0</strong>
+              <span>SAKIT</span>
+            </div>
+
+            <div class="summary-box">
+              <strong id="totalAlpa">0</strong>
+              <span>ALPA</span>
+            </div>
+
+          </div>
+
+          <div class="table-wrapper">
+
+            <table>
+
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Nama Guru</th>
+                  <th>Hadir</th>
+                  <th>Terlambat</th>
+                  <th>Izin</th>
+                  <th>Sakit</th>
+                  <th>Alpa</th>
+                </tr>
+              </thead>
+
+              <tbody id="rekapTable"></tbody>
+
+            </table>
+
+          </div>
+
+          <button
+            class="btn btn-green"
+            onclick="window.print()">
+            🖨️ Cetak Rekap
+          </button>
+
+        </div>
+
       </div>
 
-      <div class="summary-box">
-        <strong id="totalSakit">0</strong>
-        <span>Sakit</span>
-      </div>
+    </section>
 
-      <div class="summary-box">
-        <strong id="totalAlpa">0</strong>
-        <span>Alpa</span>
-      </div>
+  </main>
 
-    </div>
-
-
-    <!-- LOADING -->
-
-    <div
-      id="loading"
-      class="loading"
-      style="display:none;">
-
-      Memuat data rekap...
-
-    </div>
-
-
-    <!-- TABEL -->
-
-    <div class="table-wrapper">
-
-      <table id="rekapTable">
-
-        <thead>
-
-          <tr>
-
-            <th>No</th>
-
-            <th>Nama Guru</th>
-
-            <th>Hadir</th>
-
-            <th>Terlambat</th>
-
-            <th>Izin</th>
-
-            <th>Sakit</th>
-
-            <th>Alpa</th>
-
-          </tr>
-
-        </thead>
-
-
-        <tbody id="rekapBody">
-
-        </tbody>
-
-      </table>
-
-    </div>
-
-
-    <button
-      class="print-button"
-      onclick="window.print()">
-
-      🖨️ Cetak Rekap
-
-    </button>
-
-  </div>
-
-</div>
+  <footer class="footer">
+    © 2026 SMK Karya Bangsa Nusantara
+  </footer>
 
 
 <script>
 
+  // ==================================================
+  // KONFIGURASI
+  // ==================================================
 
-// ==================================================
-// URL APPS SCRIPT
-// ==================================================
-
-const API_URL =
-"https://script.google.com/macros/s/AKfycby--58s4qJ3QocY3bb7pM_RB9Jm5wb8NDDTBXyEsul733suyFoHjgdOS-XKbbteyAPg/exec";
-
-
-// ==================================================
-// ELEMENT SCANNER
-// ==================================================
-
-const video =
-document.getElementById("video");
-
-const canvas =
-document.getElementById("canvas");
-
-const context =
-canvas.getContext("2d");
+  const API_URL =
+    "https://script.google.com/macros/s/AKfycby--58s4qJ3QocY3bb7pM_RB9Jm5wb8NDDTBXyEsul733suyFoHjgdOS-XKbbteyAPg/exec";
 
 
-let scanning = true;
+  // ==================================================
+  // JAM DIGITAL
+  // ==================================================
+
+  function updateClock() {
+
+    const sekarang = new Date();
+
+    const jam =
+      String(sekarang.getHours()).padStart(2, "0");
+
+    const menit =
+      String(sekarang.getMinutes()).padStart(2, "0");
+
+    const detik =
+      String(sekarang.getSeconds()).padStart(2, "0");
+
+    document.getElementById("clock").textContent =
+      jam + ":" + menit + ":" + detik;
 
 
-// ==================================================
-// PINDAH HALAMAN
-// ==================================================
+    const namaHari = [
+      "Minggu",
+      "Senin",
+      "Selasa",
+      "Rabu",
+      "Kamis",
+      "Jumat",
+      "Sabtu"
+    ];
 
-function showPage(page) {
+    const namaBulan = [
+      "Januari",
+      "Februari",
+      "Maret",
+      "April",
+      "Mei",
+      "Juni",
+      "Juli",
+      "Agustus",
+      "September",
+      "Oktober",
+      "November",
+      "Desember"
+    ];
 
-  const scanPage =
-    document.getElementById("scanPage");
+    const tanggal =
+      sekarang.getDate();
 
-  const rekapPage =
-    document.getElementById("rekapPage");
+    const bulan =
+      namaBulan[sekarang.getMonth()];
 
-  const btnScan =
-    document.getElementById("btnScan");
+    const tahun =
+      sekarang.getFullYear();
 
-  const btnRekap =
-    document.getElementById("btnRekap");
-
-
-  if (page === "scan") {
-
-    scanPage.classList.add("active");
-
-    rekapPage.classList.remove("active");
-
-    btnScan.classList.add("active");
-
-    btnRekap.classList.remove("active");
-
-    startCamera();
-
+    document.getElementById("date").textContent =
+      namaHari[sekarang.getDay()] +
+      ", " +
+      tanggal +
+      " " +
+      bulan +
+      " " +
+      tahun;
   }
 
+  updateClock();
 
-  if (page === "rekap") {
-
-    scanPage.classList.remove("active");
-
-    rekapPage.classList.add("active");
-
-    btnScan.classList.remove("active");
-
-    btnRekap.classList.add("active");
-
-    stopCamera();
-
-    loadRekap();
-
-  }
-
-}
+  setInterval(updateClock, 1000);
 
 
-// ==================================================
-// KAMERA
-// ==================================================
+  // ==================================================
+  // PINDAH HALAMAN
+  // ==================================================
 
-let stream = null;
+  function showPage(page) {
+
+    document
+      .querySelectorAll(".page")
+      .forEach(function(el) {
+        el.classList.remove("active");
+      });
+
+    document
+      .querySelectorAll(".menu button")
+      .forEach(function(el) {
+        el.classList.remove("active");
+      });
 
 
-async function startCamera() {
+    if (page === "dashboard") {
 
-  try {
+      document
+        .getElementById("dashboardPage")
+        .classList.add("active");
 
-    if (stream) {
-      return;
+      document
+        .getElementById("btnDashboard")
+        .classList.add("active");
+
+      loadDashboard();
+
     }
 
 
-    stream =
-      await navigator.mediaDevices
-        .getUserMedia({
+    else if (page === "scan") {
+
+      document
+        .getElementById("scanPage")
+        .classList.add("active");
+
+      document
+        .getElementById("btnScan")
+        .classList.add("active");
+
+    }
+
+
+    else if (page === "rekap") {
+
+      document
+        .getElementById("rekapPage")
+        .classList.add("active");
+
+      document
+        .getElementById("btnRekap")
+        .classList.add("active");
+
+    }
+
+  }
+
+
+  // ==================================================
+  // DASHBOARD
+  // ==================================================
+
+  function loadDashboard() {
+
+    document.getElementById("dashboardInfo").textContent =
+      "Memuat data...";
+
+
+    const callbackName =
+      "dashboardCallback_" +
+      Date.now();
+
+
+    window[callbackName] = function(data) {
+
+      try {
+
+        if (!data.sukses) {
+
+          document.getElementById("dashboardInfo").textContent =
+            data.pesan || "Gagal mengambil data.";
+
+          return;
+        }
+
+
+        document.getElementById("totalGuru").textContent =
+          data.totalGuru;
+
+        document.getElementById("sudahPresensi").textContent =
+          data.sudahPresensi;
+
+        document.getElementById("belumPresensi").textContent =
+          data.belumPresensi;
+
+        document.getElementById("jumlahHadir").textContent =
+          data.hadir;
+
+        document.getElementById("jumlahTerlambat").textContent =
+          data.terlambat;
+
+
+        document.getElementById("dashboardInfo").textContent =
+          "Data presensi tanggal " + data.tanggal;
+
+      }
+
+      catch (error) {
+
+        document.getElementById("dashboardInfo").textContent =
+          "Terjadi kesalahan menampilkan data.";
+
+      }
+
+
+      delete window[callbackName];
+
+      const script =
+        document.getElementById(callbackName);
+
+      if (script) {
+        script.remove();
+      }
+
+    };
+
+
+    const script =
+      document.createElement("script");
+
+    script.id = callbackName;
+
+    script.src =
+      API_URL +
+      "?dashboard=1&callback=" +
+      callbackName;
+
+    script.onerror = function() {
+
+      document.getElementById("dashboardInfo").textContent =
+        "Gagal terhubung ke server.";
+
+      delete window[callbackName];
+      script.remove();
+
+    };
+
+
+    document.body.appendChild(script);
+
+  }
+
+
+  // ==================================================
+  // KAMERA / SCANNER
+  // ==================================================
+
+  let videoStream = null;
+  let scanning = false;
+  let scanAnimation = null;
+  let lastScannedId = "";
+  let lastScanTime = 0;
+
+
+  const video =
+    document.getElementById("video");
+
+  const canvas =
+    document.getElementById("canvas");
+
+  const context =
+    canvas.getContext("2d");
+
+
+  async function startCamera() {
+
+    try {
+
+      if (videoStream) {
+        return;
+      }
+
+
+      videoStream =
+        await navigator.mediaDevices.getUserMedia({
           video: {
             facingMode: {
               ideal: "environment"
@@ -772,84 +876,97 @@ async function startCamera() {
         });
 
 
-    video.srcObject = stream;
+      video.srcObject =
+        videoStream;
 
-    video.setAttribute("playsinline", true);
+      scanning = true;
 
-    video.play();
 
-    requestAnimationFrame(scanQR);
+      document.getElementById(
+        "startCameraButton"
+      ).style.display = "none";
+
+
+      document.getElementById(
+        "stopCameraButton"
+      ).style.display = "block";
+
+
+      requestAnimationFrame(scanQR);
+
+    }
+
+    catch (error) {
+
+      showResult(
+        "error",
+        "❌ Kamera tidak dapat digunakan.<br><br>" +
+        "Pastikan izin kamera sudah diberikan."
+      );
+
+    }
 
   }
 
-  catch (error) {
 
-    console.error(error);
+  function stopCamera() {
 
-    alert(
-      "Kamera tidak dapat digunakan. Pastikan izin kamera sudah diberikan."
-    );
+    scanning = false;
+
+
+    if (scanAnimation) {
+      cancelAnimationFrame(scanAnimation);
+    }
+
+
+    if (videoStream) {
+
+      videoStream
+        .getTracks()
+        .forEach(function(track) {
+          track.stop();
+        });
+
+      videoStream = null;
+    }
+
+
+    video.srcObject = null;
+
+
+    document.getElementById(
+      "startCameraButton"
+    ).style.display = "block";
+
+
+    document.getElementById(
+      "stopCameraButton"
+    ).style.display = "none";
 
   }
 
-}
+
+  function scanQR() {
+
+    if (!scanning) {
+      return;
+    }
 
 
-// ==================================================
-// STOP KAMERA
-// ==================================================
+    if (
+      video.readyState ===
+      video.HAVE_ENOUGH_DATA
+    ) {
 
-function stopCamera() {
+      canvas.width =
+        video.videoWidth;
 
-  if (!stream) {
-    return;
-  }
-
-
-  stream
-    .getTracks()
-    .forEach(track => track.stop());
+      canvas.height =
+        video.videoHeight;
 
 
-  stream = null;
-
-}
-
-
-// ==================================================
-// SCAN QR
-// ==================================================
-
-function scanQR() {
-
-  if (!stream || !scanning) {
-    return;
-  }
-
-
-  if (
-    video.readyState ===
-    video.HAVE_ENOUGH_DATA
-  ) {
-
-    canvas.width =
-      video.videoWidth;
-
-    canvas.height =
-      video.videoHeight;
-
-
-    context.drawImage(
-      video,
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    );
-
-
-    const imageData =
-      context.getImageData(
+      context.drawImage(
+        video,
         0,
         0,
         canvas.width,
@@ -857,402 +974,403 @@ function scanQR() {
       );
 
 
-    const code =
-      jsQR(
-        imageData.data,
-        imageData.width,
-        imageData.height,
-        {
-          inversionAttempts:
-            "dontInvert"
+      const imageData =
+        context.getImageData(
+          0,
+          0,
+          canvas.width,
+          canvas.height
+        );
+
+
+      const code =
+        jsQR(
+          imageData.data,
+          imageData.width,
+          imageData.height,
+          {
+            inversionAttempts:
+              "dontInvert"
+          }
+        );
+
+
+      if (code && code.data) {
+
+        const idGuru =
+          String(code.data).trim();
+
+        const sekarang =
+          Date.now();
+
+
+        // Mencegah scan berulang
+        // dalam waktu singkat
+
+        if (
+          idGuru === lastScannedId &&
+          sekarang - lastScanTime < 5000
+        ) {
+
+          scanAnimation =
+            requestAnimationFrame(scanQR);
+
+          return;
         }
-      );
 
 
-    if (code && code.data) {
+        lastScannedId =
+          idGuru;
 
-      scanning = false;
+        lastScanTime =
+          sekarang;
 
-      stopCamera();
 
-      prosesQR(
-        code.data.trim()
-      );
+        prosesPresensi(idGuru);
 
-      return;
+      }
 
     }
+
+
+    scanAnimation =
+      requestAnimationFrame(scanQR);
 
   }
 
 
-  requestAnimationFrame(scanQR);
+  // ==================================================
+  // PROSES PRESENSI
+  // ==================================================
 
-}
+  function prosesPresensi(idGuru) {
 
-
-// ==================================================
-// PROSES QR
-// ==================================================
-
-function prosesQR(idGuru) {
-
-  const result =
-    document.getElementById("result");
-
-  const resultTitle =
-    document.getElementById("resultTitle");
-
-  const resultName =
-    document.getElementById("resultName");
-
-  const resultInfo =
-    document.getElementById("resultInfo");
-
-  const resultStatus =
-    document.getElementById("resultStatus");
+    showResult(
+      "success",
+      "⏳ Memproses presensi..."
+    );
 
 
-  result.style.display =
-    "block";
-
-  result.className =
-    "result";
+    const callbackName =
+      "presensiCallback_" +
+      Date.now();
 
 
-  resultTitle.textContent =
-    "MEMPROSES PRESENSI...";
+    window[callbackName] =
+      function(data) {
+
+        try {
+
+          if (data.sukses) {
+
+            let statusClass =
+              "success";
+
+            if (
+              String(data.status)
+                .toUpperCase() ===
+              "TERLAMBAT"
+            ) {
+              statusClass =
+                "warning";
+            }
 
 
-  resultName.textContent =
-    "";
+            showResult(
+              statusClass,
 
-  resultInfo.textContent =
-    "";
+              "✅ PRESENSI BERHASIL" +
 
-  resultStatus.textContent =
-    "";
+              "<div class='big'>" +
+              escapeHtml(data.nama) +
+              "</div>" +
 
+              "Tanggal: " +
+              escapeHtml(data.tanggal) +
 
+              "<br>" +
 
-  const callbackName =
-    "callbackPresensi_" +
-    Date.now();
+              "Jam: " +
+              escapeHtml(data.jam) +
 
+              "<br>" +
 
-  window[callbackName] =
-    function(data) {
+              "Status: <strong>" +
+              escapeHtml(data.status) +
+              "</strong>"
+            );
 
-      delete window[callbackName];
-
-
-      if (data.sudahPresensi) {
-
-        result.className =
-          "result warning";
-
-
-        resultTitle.textContent =
-          "⚠️ SUDAH PRESENSI HARI INI";
+          }
 
 
-        resultName.textContent =
-          data.nama;
+          else if (
+            data.sudahPresensi
+          ) {
+
+            showResult(
+              "warning",
+
+              "⚠️ SUDAH PRESENSI" +
+
+              "<div class='big'>" +
+              escapeHtml(data.nama || "") +
+              "</div>" +
+
+              escapeHtml(data.pesan || "") +
+
+              "<br><br>" +
+
+              "Jam: " +
+              escapeHtml(data.jam || "") +
+
+              "<br>" +
+
+              "Status: <strong>" +
+              escapeHtml(data.status || "") +
+              "</strong>"
+            );
+
+          }
 
 
-        resultInfo.innerHTML =
-          "ID Guru: " +
-          data.id +
-          "<br>" +
-          "Tanggal: " +
-          data.tanggal +
-          "<br>" +
-          "Jam: " +
-          data.jam;
+          else {
 
+            showResult(
+              "error",
 
-        resultStatus.textContent =
-          data.status;
+              "❌ PRESENSI GAGAL<br><br>" +
 
+              escapeHtml(
+                data.pesan ||
+                "Data guru tidak ditemukan."
+              )
+            );
 
-        resultStatus.className =
-          "status " +
-          (
-            data.status === "HADIR"
-              ? "hadir"
-              : "terlambat"
+          }
+
+        }
+
+        catch (error) {
+
+          showResult(
+            "error",
+            "Terjadi kesalahan."
           );
 
-
-        return;
-
-      }
+        }
 
 
-      if (!data.sukses) {
+        delete window[callbackName];
 
-        result.className =
-          "result warning";
+        const script =
+          document.getElementById(callbackName);
 
+        if (script) {
+          script.remove();
+        }
 
-        resultTitle.textContent =
-          "❌ PRESENSI GAGAL";
-
-
-        resultInfo.textContent =
-          data.pesan ||
-          "Terjadi kesalahan.";
+      };
 
 
-        return;
+    const script =
+      document.createElement("script");
 
-      }
-
-
-      result.className =
-        "result success";
+    script.id =
+      callbackName;
 
 
-      resultTitle.textContent =
-        "✅ PRESENSI BERHASIL";
+    script.src =
+      API_URL +
+      "?id=" +
+      encodeURIComponent(idGuru) +
+      "&callback=" +
+      callbackName;
 
 
-      resultName.textContent =
-        data.nama;
+    script.onerror =
+      function() {
 
-
-      resultInfo.innerHTML =
-        "ID Guru: " +
-        data.id +
-        "<br>" +
-        "Tanggal: " +
-        data.tanggal +
-        "<br>" +
-        "Jam: " +
-        data.jam;
-
-
-      resultStatus.textContent =
-        data.status;
-
-
-      resultStatus.className =
-        "status " +
-        (
-          data.status === "HADIR"
-            ? "hadir"
-            : "terlambat"
+        showResult(
+          "error",
+          "❌ Gagal terhubung ke server."
         );
 
-    };
 
+        delete window[callbackName];
 
-  const script =
-    document.createElement("script");
+        script.remove();
 
+      };
 
-  script.src =
-    API_URL +
-    "?id=" +
-    encodeURIComponent(idGuru) +
-    "&callback=" +
-    callbackName +
-    "&t=" +
-    Date.now();
 
+    document.body.appendChild(script);
 
-  script.onerror =
-    function() {
+  }
 
-      delete window[callbackName];
 
+  // ==================================================
+  // HASIL SCAN
+  // ==================================================
 
-      result.className =
-        "result warning";
+  function showResult(type, html) {
 
+    const result =
+      document.getElementById("result");
 
-      resultTitle.textContent =
-        "❌ KONEKSI GAGAL";
+    result.className =
+      "result " + type;
 
+    result.innerHTML =
+      html;
 
-      resultInfo.textContent =
-        "Tidak dapat terhubung ke server presensi.";
+    result.style.display =
+      "block";
 
-    };
+  }
 
 
-  document.body.appendChild(script);
+  // ==================================================
+  // REKAP BULANAN
+  // ==================================================
 
-}
+  function loadRekap() {
 
+    const bulan =
+      document.getElementById("bulan").value;
 
-// ==================================================
-// REKAP BULANAN
-// ==================================================
+    const tahun =
+      document.getElementById("tahun").value;
 
-function loadRekap() {
 
-  const bulan =
-    document.getElementById("bulan").value;
+    document.getElementById(
+      "rekapContent"
+    ).style.display = "none";
 
-  const tahun =
-    document.getElementById("tahun").value;
 
+    document.getElementById(
+      "rekapLoading"
+    ).style.display = "block";
 
-  const loading =
-    document.getElementById("loading");
 
-  const body =
-    document.getElementById("rekapBody");
+    document.getElementById(
+      "rekapLoading"
+    ).textContent =
+      "⏳ Memuat rekap...";
 
-  const error =
-    document.getElementById("rekapError");
 
-  const summary =
-    document.getElementById("summary");
+    const callbackName =
+      "rekapCallback_" +
+      Date.now();
 
 
-  error.style.display =
-    "none";
+    window[callbackName] =
+      function(data) {
 
+        try {
 
-  summary.style.display =
-    "none";
+          if (!data.sukses) {
 
+            document.getElementById(
+              "rekapLoading"
+            ).textContent =
+              data.pesan ||
+              "Gagal mengambil rekap.";
 
-  loading.style.display =
-    "block";
+            return;
 
+          }
 
-  body.innerHTML =
-    "";
 
+          tampilkanRekap(data.data);
 
-  const callbackName =
-    "callbackRekap_" +
-    Date.now();
+        }
 
+        catch (error) {
 
-  window[callbackName] =
-    function(data) {
+          document.getElementById(
+            "rekapLoading"
+          ).textContent =
+            "Terjadi kesalahan.";
 
-      delete window[callbackName];
+        }
 
 
-      loading.style.display =
-        "none";
+        delete window[callbackName];
 
+        const script =
+          document.getElementById(callbackName);
 
-      if (!data.sukses) {
+        if (script) {
+          script.remove();
+        }
 
-        error.textContent =
-          data.pesan ||
-          "Gagal mengambil data rekap.";
+      };
 
-        error.style.display =
-          "block";
 
-        return;
+    const script =
+      document.createElement("script");
 
-      }
+    script.id =
+      callbackName;
 
 
-      tampilkanRekap(
-        data.data
-      );
+    script.src =
+      API_URL +
+      "?bulan=" +
+      encodeURIComponent(bulan) +
+      "&tahun=" +
+      encodeURIComponent(tahun) +
+      "&callback=" +
+      callbackName;
 
-    };
 
+    script.onerror =
+      function() {
 
-  const script =
-    document.createElement("script");
+        document.getElementById(
+          "rekapLoading"
+        ).textContent =
+          "❌ Gagal terhubung ke server.";
 
+        delete window[callbackName];
 
-  script.src =
-    API_URL +
-    "?bulan=" +
-    encodeURIComponent(bulan) +
-    "&tahun=" +
-    encodeURIComponent(tahun) +
-    "&callback=" +
-    callbackName +
-    "&t=" +
-    Date.now();
+        script.remove();
 
+      };
 
-  script.onerror =
-    function() {
 
-      delete window[callbackName];
+    document.body.appendChild(script);
 
+  }
 
-      loading.style.display =
-        "none";
 
+  // ==================================================
+  // TAMPILKAN REKAP
+  // ==================================================
 
-      error.textContent =
-        "Tidak dapat terhubung ke server.";
+  function tampilkanRekap(data) {
 
-      error.style.display =
-        "block";
+    const tbody =
+      document.getElementById("rekapTable");
 
-    };
 
+    tbody.innerHTML = "";
 
-  document.body.appendChild(script);
 
-}
+    let totalHadir = 0;
+    let totalTerlambat = 0;
+    let totalIzin = 0;
+    let totalSakit = 0;
+    let totalAlpa = 0;
 
 
-// ==================================================
-// TAMPILKAN REKAP
-// ==================================================
+    data.forEach(function(guru, index) {
 
-function tampilkanRekap(data) {
-
-  const body =
-    document.getElementById("rekapBody");
-
-
-  body.innerHTML =
-    "";
-
-
-  let totalHadir = 0;
-
-  let totalTerlambat = 0;
-
-  let totalIzin = 0;
-
-  let totalSakit = 0;
-
-  let totalAlpa = 0;
-
-
-  data.forEach(
-    function(guru, index) {
-
-      totalHadir +=
-        Number(guru.hadir || 0);
-
-      totalTerlambat +=
-        Number(guru.terlambat || 0);
-
-      totalIzin +=
-        Number(guru.izin || 0);
-
-      totalSakit +=
-        Number(guru.sakit || 0);
-
-      totalAlpa +=
-        Number(guru.alpa || 0);
-
-
-      const row =
+      const tr =
         document.createElement("tr");
 
 
-      row.innerHTML =
+      tr.innerHTML =
 
         "<td>" +
         (index + 1) +
@@ -1283,87 +1401,192 @@ function tampilkanRekap(data) {
         "</td>";
 
 
-      body.appendChild(row);
+      tbody.appendChild(tr);
+
+
+      totalHadir +=
+        Number(guru.hadir) || 0;
+
+      totalTerlambat +=
+        Number(guru.terlambat) || 0;
+
+      totalIzin +=
+        Number(guru.izin) || 0;
+
+      totalSakit +=
+        Number(guru.sakit) || 0;
+
+      totalAlpa +=
+        Number(guru.alpa) || 0;
+
+    });
+
+
+    document.getElementById(
+      "totalHadir"
+    ).textContent =
+      totalHadir;
+
+
+    document.getElementById(
+      "totalTerlambat"
+    ).textContent =
+      totalTerlambat;
+
+
+    document.getElementById(
+      "totalIzin"
+    ).textContent =
+      totalIzin;
+
+
+    document.getElementById(
+      "totalSakit"
+    ).textContent =
+      totalSakit;
+
+
+    document.getElementById(
+      "totalAlpa"
+    ).textContent =
+      totalAlpa;
+
+
+    document.getElementById(
+      "rekapLoading"
+    ).style.display =
+      "none";
+
+
+    document.getElementById(
+      "rekapContent"
+    ).style.display =
+      "block";
+
+  }
+
+
+  // ==================================================
+  // ESCAPE HTML
+  // ==================================================
+
+  function escapeHtml(value) {
+
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+
+  }
+
+
+  // ==================================================
+  // ISI TAHUN
+  // ==================================================
+
+  function isiTahun() {
+
+    const select =
+      document.getElementById("tahun");
+
+    const tahunSekarang =
+      new Date().getFullYear();
+
+
+    for (
+      let tahun = tahunSekarang - 2;
+      tahun <= tahunSekarang + 1;
+      tahun++
+    ) {
+
+      const option =
+        document.createElement("option");
+
+      option.value =
+        tahun;
+
+      option.textContent =
+        tahun;
+
+
+      if (
+        tahun === tahunSekarang
+      ) {
+        option.selected = true;
+      }
+
+
+      select.appendChild(option);
 
     }
-  );
+
+  }
 
 
-  document.getElementById("totalHadir")
-    .textContent =
-    totalHadir;
+  // ==================================================
+  // BULAN SAAT INI
+  // ==================================================
+
+  function setBulanSekarang() {
+
+    document.getElementById("bulan").value =
+      new Date().getMonth() + 1;
+
+  }
 
 
-  document.getElementById("totalTerlambat")
-    .textContent =
-    totalTerlambat;
+  // ==================================================
+  // INISIALISASI
+  // ==================================================
 
+  isiTahun();
 
-  document.getElementById("totalIzin")
-    .textContent =
-    totalIzin;
+  setBulanSekarang();
 
-
-  document.getElementById("totalSakit")
-    .textContent =
-    totalSakit;
-
-
-  document.getElementById("totalAlpa")
-    .textContent =
-    totalAlpa;
-
-
-  document.getElementById("summary")
-    .style.display =
-    "grid";
-
-}
-
-
-// ==================================================
-// AMANKAN NAMA
-// ==================================================
-
-function escapeHtml(text) {
-
-  const div =
-    document.createElement("div");
-
-  div.textContent =
-    text;
-
-  return div.innerHTML;
-
-}
-
-
-// ==================================================
-// TAHUN DEFAULT
-// ==================================================
-
-document.getElementById("tahun")
-  .value =
-  new Date().getFullYear();
-
-
-// ==================================================
-// BULAN DEFAULT
-// ==================================================
-
-document.getElementById("bulan")
-  .value =
-  new Date().getMonth() + 1;
-
-
-// ==================================================
-// MULAI KAMERA
-// ==================================================
-
-startCamera();
+  loadDashboard();
 
 </script>
 
 
+<style>
+
+  @media print {
+
+    body {
+      background: white;
+    }
+
+    .header {
+      box-shadow: none;
+    }
+
+    .menu,
+    .btn,
+    .footer,
+    #dashboardPage,
+    #scanPage,
+    .filter {
+      display: none !important;
+    }
+
+    #rekapPage {
+      display: block !important;
+    }
+
+    .card {
+      box-shadow: none;
+    }
+
+    table {
+      font-size: 11px;
+    }
+
+  }
+
+</style>
+
 </body>
 </html>
+```
