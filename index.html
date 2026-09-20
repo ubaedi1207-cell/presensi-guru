@@ -1,94 +1,361 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Test Kamera</title>
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+  <title>Presensi Guru</title>
+
+  <script src="https://unpkg.com/html5-qrcode"></script>
 
   <style>
+
     body {
+      margin: 0;
       font-family: Arial, sans-serif;
+      background: #f1f5f9;
+    }
+
+    .app {
+      max-width: 500px;
+      margin: auto;
+      min-height: 100vh;
+      background: white;
+    }
+
+    .header {
+      background: #166534;
+      color: white;
       text-align: center;
+      padding: 25px 15px;
+    }
+
+    .header h1 {
+      margin: 0;
+    }
+
+    .header p {
+      margin: 8px 0 0;
+    }
+
+    .content {
       padding: 20px;
     }
 
-    video {
+    #reader {
       width: 100%;
       max-width: 400px;
+      margin: auto;
+    }
+
+    #hasil {
+      display: none;
       margin-top: 20px;
+      padding: 20px;
       border-radius: 15px;
-      background: black;
+      text-align: center;
+      background: #f0fdf4;
+      border: 2px solid #22c55e;
+    }
+
+    #hasil h2 {
+      color: #15803d;
+    }
+
+    .nama {
+      font-size: 22px;
+      font-weight: bold;
+      margin: 15px 0;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 20px;
+      background: #16a34a;
+      color: white;
+      font-weight: bold;
+    }
+
+    .terlambat {
+      background: #dc2626;
+    }
+
+    #pesan {
+      text-align: center;
+      margin: 15px 0;
+      color: #475569;
     }
 
     button {
-      padding: 15px 25px;
-      font-size: 18px;
+      display: none;
+      width: 100%;
+      padding: 15px;
       margin-top: 20px;
+      border: none;
+      border-radius: 10px;
+      background: #166534;
+      color: white;
+      font-size: 16px;
     }
 
-    #status {
-      margin-top: 20px;
-      padding: 15px;
-      background: #eee;
-      border-radius: 10px;
-    }
   </style>
+
 </head>
+
 
 <body>
 
-<h2>TEST KAMERA PRESENSI</h2>
+<div class="app">
 
-<div id="status">
-  Tekan tombol untuk membuka kamera
+  <div class="header">
+
+    <h1>Presensi Guru</h1>
+
+    <p>SMK Karya Bangsa Nusantara</p>
+
+  </div>
+
+
+  <div class="content">
+
+    <div id="pesan">
+      Arahkan kamera ke QR Code guru
+    </div>
+
+    <div id="reader"></div>
+
+
+    <div id="hasil">
+
+      <h2>✓ PRESENSI BERHASIL</h2>
+
+      <div class="nama" id="nama"></div>
+
+      <p>
+        ID Guru:
+        <span id="id"></span>
+      </p>
+
+      <p>
+        Tanggal:
+        <span id="tanggal"></span>
+      </p>
+
+      <p>
+        Jam:
+        <span id="jam"></span>
+      </p>
+
+      <div class="status" id="status"></div>
+
+    </div>
+
+
+    <button id="scanLagi"
+            onclick="location.reload()">
+
+      SCAN GURU BERIKUTNYA
+
+    </button>
+
+  </div>
+
 </div>
 
-<button onclick="bukaKamera()">
-  📷 BUKA KAMERA
-</button>
-
-<br>
-
-<video id="video" autoplay playsinline></video>
 
 <script>
 
-async function bukaKamera() {
+const API_URL =
+"https://script.google.com/macros/s/AKfycby--58s4qJ3QocY3bb7pM_RB9Jm5wb8NDDTBXyEsul733suyFoHjgdOS-XKbbteyAPg/exec";
+
+
+let sudahScan = false;
+
+
+/* =========================
+   HASIL SCAN
+========================= */
+
+function onScanSuccess(decodedText) {
+
+  if (sudahScan) return;
+
+  sudahScan = true;
+
+  document.getElementById("pesan").innerText =
+    "QR berhasil dibaca. Memproses...";
+
+  // Tampilkan ID sementara
+  document.getElementById("id").innerText =
+    decodedText;
+
+  kirimKeServer(decodedText);
+
+}
+
+
+/* =========================
+   KIRIM KE APPS SCRIPT
+========================= */
+
+function kirimKeServer(idGuru) {
+
+  const callback =
+    "callback_" + Date.now();
+
+
+  window[callback] = function(data) {
+
+    if (data.sukses) {
+
+      tampilkanHasil(data);
+
+    } else {
+
+      document.getElementById("pesan").innerText =
+        "❌ " + data.pesan;
+
+      document.getElementById("scanLagi").style.display =
+        "block";
+
+    }
+
+    delete window[callback];
+
+    if (script.parentNode) {
+      script.parentNode.removeChild(script);
+    }
+
+  };
+
+
+  const script =
+    document.createElement("script");
+
+
+  script.src =
+    API_URL +
+    "?id=" +
+    encodeURIComponent(idGuru) +
+    "&callback=" +
+    callback;
+
+
+  script.onerror = function() {
+
+    document.getElementById("pesan").innerText =
+      "❌ Tidak dapat terhubung ke server.";
+
+    document.getElementById("scanLagi").style.display =
+      "block";
+
+  };
+
+
+  document.body.appendChild(script);
+
+}
+
+
+/* =========================
+   TAMPILKAN HASIL
+========================= */
+
+function tampilkanHasil(data) {
+
+  document.getElementById("reader").style.display =
+    "none";
+
+  document.getElementById("pesan").style.display =
+    "none";
+
+  document.getElementById("hasil").style.display =
+    "block";
+
+
+  document.getElementById("nama").innerText =
+    data.nama;
+
+  document.getElementById("id").innerText =
+    data.id;
+
+  document.getElementById("tanggal").innerText =
+    data.tanggal;
+
+  document.getElementById("jam").innerText =
+    data.jam;
+
 
   const status =
     document.getElementById("status");
 
-  const video =
-    document.getElementById("video");
 
-  try {
+  status.innerText =
+    data.status;
 
-    const stream =
-      await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: "environment"
-        },
-        audio: false
-      });
 
-    video.srcObject = stream;
+  if (data.status === "TERLAMBAT") {
 
-    status.innerHTML =
-      "✅ KAMERA BERHASIL DIBUKA";
-
-  } catch (error) {
-
-    status.innerHTML =
-      "❌ KAMERA GAGAL DIBUKA<br><br>" +
-      error.name +
-      "<br>" +
-      error.message;
+    status.classList.add("terlambat");
 
   }
 
+
+  document.getElementById("scanLagi").style.display =
+    "block";
+
 }
+
+
+/* =========================
+   ERROR SCAN
+========================= */
+
+function onScanFailure(error) {
+
+  // Abaikan error ketika QR belum terbaca
+
+}
+
+
+/* =========================
+   JALANKAN SCANNER
+========================= */
+
+const scanner =
+  new Html5QrcodeScanner(
+
+    "reader",
+
+    {
+      fps: 10,
+
+      qrbox: {
+        width: 250,
+        height: 250
+      },
+
+      rememberLastUsedCamera: true
+
+    },
+
+    false
+
+  );
+
+
+scanner.render(
+  onScanSuccess,
+  onScanFailure
+);
 
 </script>
 
 </body>
+
 </html>
