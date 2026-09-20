@@ -7,9 +7,7 @@
 <meta name="viewport"
       content="width=device-width, initial-scale=1.0">
 
-<title>Scanner Presensi Guru</title>
-
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<title>Presensi Guru</title>
 
 <style>
 
@@ -72,14 +70,34 @@ canvas {
   border: 2px solid #22c55e;
 }
 
-.idguru {
-  font-size: 28px;
+#nama {
+  font-size: 22px;
   font-weight: bold;
-  margin: 15px;
+  margin: 12px 0;
+}
+
+#idGuru {
+  font-size: 18px;
+}
+
+.status {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 10px 20px;
+  border-radius: 25px;
+  background: #16a34a;
+  color: white;
+  font-weight: bold;
+}
+
+.terlambat {
+  background: #dc2626;
 }
 
 button {
-  padding: 14px 25px;
+  width: 100%;
+  padding: 14px;
+  margin-top: 20px;
   border: none;
   border-radius: 10px;
   background: #166534;
@@ -103,31 +121,58 @@ button {
 
   </div>
 
+
   <div class="content">
 
     <div id="status">
-      Meminta akses kamera...
+      Membuka kamera...
     </div>
+
 
     <video id="video"
            autoplay
            playsinline></video>
 
+
     <canvas id="canvas"></canvas>
+
 
     <div id="hasil">
 
-      <h2>QR TERBACA</h2>
+      <h2>✓ PRESENSI BERHASIL</h2>
 
-      <div class="idguru"
-           id="idGuru"></div>
+      <div id="nama"></div>
+
+      <div>
+        ID Guru:
+        <span id="idGuru"></span>
+      </div>
+
+      <div>
+        Tanggal:
+        <span id="tanggal"></span>
+      </div>
+
+      <div>
+        Jam:
+        <span id="jam"></span>
+      </div>
+
+      <div
+        class="status"
+        id="statusPresensi">
+      </div>
 
     </div>
 
-    <br>
 
-    <button onclick="mulaiKamera()">
-      📷 Buka Kamera
+    <button
+      id="scanLagi"
+      onclick="location.reload()"
+      style="display:none;">
+
+      SCAN GURU BERIKUTNYA
+
     </button>
 
   </div>
@@ -137,21 +182,56 @@ button {
 
 <script>
 
+
+/* =========================
+   URL APPS SCRIPT
+========================= */
+
+const API_URL =
+"https://script.google.com/macros/s/AKfycby--58s4qJ3QocY3bb7pM_RB9Jm5wb8NDDTBXyEsul733suyFoHjgdOS-XKbbteyAPg/exec";
+
+
+/* =========================
+   ELEMENT
+========================= */
+
 const video =
-  document.getElementById("video");
+document.getElementById("video");
 
 const canvas =
-  document.getElementById("canvas");
+document.getElementById("canvas");
 
 const ctx =
-  canvas.getContext("2d");
+canvas.getContext("2d");
 
 const status =
-  document.getElementById("status");
+document.getElementById("status");
+
 
 let stream = null;
 
 let scanning = false;
+
+
+/* =========================
+   LOAD jsQR
+========================= */
+
+const scriptQR =
+document.createElement("script");
+
+scriptQR.src =
+"https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js";
+
+
+scriptQR.onload = function() {
+
+  mulaiKamera();
+
+};
+
+
+document.head.appendChild(scriptQR);
 
 
 /* =========================
@@ -161,14 +241,6 @@ let scanning = false;
 async function mulaiKamera() {
 
   try {
-
-    if (stream) {
-
-      stream.getTracks().forEach(
-        track => track.stop()
-      );
-
-    }
 
     stream =
       await navigator.mediaDevices.getUserMedia({
@@ -216,6 +288,7 @@ function scanQR() {
 
   if (!scanning) return;
 
+
   if (video.readyState === video.HAVE_ENOUGH_DATA) {
 
     canvas.width =
@@ -255,22 +328,12 @@ function scanQR() {
 
       scanning = false;
 
-      document.getElementById("idGuru")
-        .innerText = code.data;
-
-      document.getElementById("hasil")
-        .style.display = "block";
+      hentikanKamera();
 
       status.innerText =
-        "✅ QR berhasil dibaca";
+        "QR terbaca. Menyimpan presensi...";
 
-      if (stream) {
-
-        stream.getTracks().forEach(
-          track => track.stop()
-        );
-
-      }
+      kirimPresensi(code.data);
 
       return;
 
@@ -278,16 +341,152 @@ function scanQR() {
 
   }
 
+
   requestAnimationFrame(scanQR);
 
 }
 
 
 /* =========================
-   OTOMATIS MULAI
+   HENTIKAN KAMERA
 ========================= */
 
-mulaiKamera();
+function hentikanKamera() {
+
+  if (stream) {
+
+    stream.getTracks().forEach(
+      track => track.stop()
+    );
+
+  }
+
+}
+
+
+/* =========================
+   KIRIM PRESENSI
+========================= */
+
+function kirimPresensi(idGuru) {
+
+  const callback =
+    "presensi_" + Date.now();
+
+
+  window[callback] = function(data) {
+
+    if (data.sukses) {
+
+      tampilkanHasil(data);
+
+    }
+
+    else {
+
+      status.innerHTML =
+        "❌ " + data.pesan;
+
+      document.getElementById("scanLagi")
+        .style.display = "block";
+
+    }
+
+
+    delete window[callback];
+
+    if (script.parentNode) {
+
+      script.parentNode.removeChild(script);
+
+    }
+
+  };
+
+
+  const script =
+    document.createElement("script");
+
+
+  script.src =
+    API_URL +
+    "?id=" +
+    encodeURIComponent(idGuru) +
+    "&callback=" +
+    callback;
+
+
+  script.onerror = function() {
+
+    status.innerHTML =
+      "❌ Tidak dapat terhubung ke server presensi.";
+
+    document.getElementById("scanLagi")
+      .style.display = "block";
+
+  };
+
+
+  document.body.appendChild(script);
+
+}
+
+
+/* =========================
+   HASIL PRESENSI
+========================= */
+
+function tampilkanHasil(data) {
+
+  document.getElementById("video")
+    .style.display = "none";
+
+
+  status.style.display =
+    "none";
+
+
+  document.getElementById("hasil")
+    .style.display = "block";
+
+
+  document.getElementById("nama")
+    .innerText = data.nama;
+
+
+  document.getElementById("idGuru")
+    .innerText = data.id;
+
+
+  document.getElementById("tanggal")
+    .innerText = data.tanggal;
+
+
+  document.getElementById("jam")
+    .innerText = data.jam;
+
+
+  const statusPresensi =
+    document.getElementById("statusPresensi");
+
+
+  statusPresensi.innerText =
+    data.status;
+
+
+  if (data.status === "TERLAMBAT") {
+
+    statusPresensi.classList.add(
+      "terlambat"
+    );
+
+  }
+
+
+  document.getElementById("scanLagi")
+    .style.display = "block";
+
+}
 
 </script>
 
