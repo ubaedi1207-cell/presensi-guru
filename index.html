@@ -2,6 +2,13 @@
 <html lang="id">
 
 <head>
+<!-- Menghubungkan ke file konfigurasi aplikasi -->
+<link rel="manifest" href="manifest.json">
+
+<!-- Optimasi Tampilan Fullscreen khusus perangkat iOS/iPhone -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Presensi Guru">
 
   <meta charset="UTF-8">
 
@@ -3396,6 +3403,16 @@ checkLogin();
   // =========================================================================
   // Panggil fungsi ini saat halaman scanner aktif / terbuka
   startCamera();
+</script>
+<script>
+  // Mendaftarkan Service Worker agar website terdeteksi sebagai aplikasi
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('Aplikasi siap diinstal!', reg))
+        .catch(err => console.log('Gagal memuat sistem PWA', err));
+    });
+  }
 </script>
 
 </body>
