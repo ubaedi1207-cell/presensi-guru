@@ -612,17 +612,55 @@
     }
 
 
-    .result {
+    /* HASIL SCAN MENUTUPI KAMERA */
 
-      margin-top: 15px;
+    .scanner-box.scan-active #video {
 
-      padding: 15px;
+      visibility: hidden;
 
-      border-radius: 12px;
+    }
+
+    .scanner-box.scan-active .scanner-frame {
 
       display: none;
 
+    }
+
+    .result {
+
+      position: absolute;
+
+      inset: 0;
+
+      margin: 0;
+
+      padding: 25px 18px;
+
+      border-radius: 16px;
+
+      display: none;
+
+      align-items: center;
+
+      justify-content: center;
+
+      flex-direction: column;
+
       text-align: center;
+
+      z-index: 20;
+
+      font-size: 16px;
+
+      background: rgba(255,255,255,0.97);
+
+    }
+
+    .result.success,
+    .result.warning,
+    .result.error {
+
+      display: flex;
 
     }
 
@@ -1211,6 +1249,11 @@
             class="scanner-frame">
           </div>
 
+          <div
+            id="result"
+            class="result">
+          </div>
+
         </div>
 
 
@@ -1246,12 +1289,6 @@
           ⛔ Matikan Kamera
 
         </button>
-
-
-        <div
-          id="result"
-          class="result">
-        </div>
 
 
       </div>
@@ -2240,7 +2277,6 @@ let lastScannedId = "";
 
 let lastScanTime = 0;
 
-// Timer untuk mengembalikan scanner ke mode siap scan
 let resetScanTimer = null;
 
 
@@ -2271,11 +2307,6 @@ async function startCamera() {
 
 
   try {
-
-    if (resetScanTimer) {
-      clearTimeout(resetScanTimer);
-      resetScanTimer = null;
-    }
 
 
     if (videoStream) {
@@ -2535,15 +2566,14 @@ function scanQR() {
       lastScanTime =
         sekarang;
 
-
-      // Hentikan scanning sementara agar hasil tetap tampil.
+      // Hentikan pembacaan QR sementara.
+      // Kamera tetap menyala, tetapi akan ditutupi hasil scan.
       scanning = false;
 
       if (scanAnimation) {
         cancelAnimationFrame(scanAnimation);
         scanAnimation = null;
       }
-
 
       prosesPresensi(
         idGuru
@@ -2600,12 +2630,10 @@ function prosesPresensi(
 
 
         if (
-
           String(
             data.status
           ).toUpperCase() ===
           "TERLAMBAT"
-
         ) {
 
           kelas =
@@ -2654,9 +2682,6 @@ function prosesPresensi(
 
         );
 
-
-        aturUlangScanner();
-
       }
 
 
@@ -2703,9 +2728,6 @@ function prosesPresensi(
 
         );
 
-
-        aturUlangScanner();
-
       }
 
 
@@ -2730,9 +2752,6 @@ function prosesPresensi(
 
         );
 
-
-        aturUlangScanner();
-
       }
 
 
@@ -2750,6 +2769,10 @@ function prosesPresensi(
       if (script) {
         script.remove();
       }
+
+      // Semua hasil scan ditampilkan 5 detik,
+      // kemudian kamera terlihat kembali dan siap scan.
+      aturUlangScanner();
 
     };
 
@@ -2791,7 +2814,6 @@ function prosesPresensi(
 
       );
 
-
       aturUlangScanner();
 
 
@@ -2814,7 +2836,7 @@ function prosesPresensi(
 
 
 // =====================================================
-// HASIL SCAN
+// TAMPILKAN HASIL DAN TUTUP KAMERA SEMENTARA
 // =====================================================
 
 function showResult(
@@ -2829,6 +2851,12 @@ function showResult(
     );
 
 
+  const scannerBox =
+    document.querySelector(
+      ".scanner-box"
+    );
+
+
   result.className =
     "result " + type;
 
@@ -2838,49 +2866,100 @@ function showResult(
 
 
   result.style.display =
-    "block";
+    "flex";
+
+
+  // Tutupi tampilan kamera dengan hasil scan.
+  if (scannerBox) {
+    scannerBox.classList.add(
+      "scan-active"
+    );
+  }
 
 }
 
 
 
 // =====================================================
-// KEMBALI KE MODE SIAP SCAN
+// KEMBALI KE MODE SIAP SCAN SETELAH 5 DETIK
 // =====================================================
 
 function aturUlangScanner() {
+
 
   if (resetScanTimer) {
     clearTimeout(resetScanTimer);
   }
 
-  scanning = false;
 
-  resetScanTimer = setTimeout(function() {
+  resetScanTimer =
+    setTimeout(function() {
 
-    const result = document.getElementById("result");
 
-    result.className = "result";
-    result.innerHTML = "";
-    result.style.display = "none";
+      const result =
+        document.getElementById(
+          "result"
+        );
 
-    lastScannedId = "";
-    lastScanTime = 0;
 
-    // Kamera tetap menyala; hanya proses scan yang diaktifkan lagi.
-    scanning = true;
+      const scannerBox =
+        document.querySelector(
+          ".scanner-box"
+        );
 
-    if (scanAnimation) {
-      cancelAnimationFrame(scanAnimation);
-    }
 
-    scanAnimation = requestAnimationFrame(scanQR);
+      // Hilangkan hasil scan.
+      result.className =
+        "result";
 
-    resetScanTimer = null;
+      result.innerHTML =
+        "";
 
-  }, 5000);
+      result.style.display =
+        "none";
+
+
+      // Tampilkan kembali kamera dan frame scanner.
+      if (scannerBox) {
+        scannerBox.classList.remove(
+          "scan-active"
+        );
+      }
+
+
+      lastScannedId =
+        "";
+
+      lastScanTime =
+        0;
+
+
+      // Kamera tidak dimatikan.
+      // Hanya proses scanning yang diaktifkan kembali.
+      scanning = true;
+
+
+      if (scanAnimation) {
+        cancelAnimationFrame(
+          scanAnimation
+        );
+      }
+
+
+      scanAnimation =
+        requestAnimationFrame(
+          scanQR
+        );
+
+
+      resetScanTimer =
+        null;
+
+
+    }, 5000);
 
 }
+
 
 
 // =====================================================
