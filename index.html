@@ -612,55 +612,17 @@
     }
 
 
-    /* HASIL SCAN MENUTUPI KAMERA */
-
-    .scanner-box.scan-active #video {
-
-      visibility: hidden;
-
-    }
-
-    .scanner-box.scan-active .scanner-frame {
-
-      display: none;
-
-    }
-
     .result {
 
-      position: absolute;
+      margin-top: 15px;
 
-      inset: 0;
+      padding: 15px;
 
-      margin: 0;
-
-      padding: 25px 18px;
-
-      border-radius: 16px;
+      border-radius: 12px;
 
       display: none;
 
-      align-items: center;
-
-      justify-content: center;
-
-      flex-direction: column;
-
       text-align: center;
-
-      z-index: 20;
-
-      font-size: 16px;
-
-      background: rgba(255,255,255,0.97);
-
-    }
-
-    .result.success,
-    .result.warning,
-    .result.error {
-
-      display: flex;
 
     }
 
@@ -1249,11 +1211,6 @@
             class="scanner-frame">
           </div>
 
-          <div
-            id="result"
-            class="result">
-          </div>
-
         </div>
 
 
@@ -1289,6 +1246,12 @@
           ⛔ Matikan Kamera
 
         </button>
+
+
+        <div
+          id="result"
+          class="result">
+        </div>
 
 
       </div>
@@ -2277,8 +2240,6 @@ let lastScannedId = "";
 
 let lastScanTime = 0;
 
-let resetScanTimer = null;
-
 
 const video =
   document.getElementById(
@@ -2566,14 +2527,6 @@ function scanQR() {
       lastScanTime =
         sekarang;
 
-      // Hentikan pembacaan QR sementara.
-      // Kamera tetap menyala, tetapi akan ditutupi hasil scan.
-      scanning = false;
-
-      if (scanAnimation) {
-        cancelAnimationFrame(scanAnimation);
-        scanAnimation = null;
-      }
 
       prosesPresensi(
         idGuru
@@ -2630,10 +2583,12 @@ function prosesPresensi(
 
 
         if (
+
           String(
             data.status
           ).toUpperCase() ===
           "TERLAMBAT"
+
         ) {
 
           kelas =
@@ -2770,10 +2725,6 @@ function prosesPresensi(
         script.remove();
       }
 
-      // Semua hasil scan ditampilkan 5 detik,
-      // kemudian kamera terlihat kembali dan siap scan.
-      aturUlangScanner();
-
     };
 
 
@@ -2814,8 +2765,6 @@ function prosesPresensi(
 
       );
 
-      aturUlangScanner();
-
 
       delete window[
         callbackName
@@ -2836,7 +2785,7 @@ function prosesPresensi(
 
 
 // =====================================================
-// TAMPILKAN HASIL DAN TUTUP KAMERA SEMENTARA
+// HASIL SCAN
 // =====================================================
 
 function showResult(
@@ -2851,12 +2800,6 @@ function showResult(
     );
 
 
-  const scannerBox =
-    document.querySelector(
-      ".scanner-box"
-    );
-
-
   result.className =
     "result " + type;
 
@@ -2866,97 +2809,7 @@ function showResult(
 
 
   result.style.display =
-    "flex";
-
-
-  // Tutupi tampilan kamera dengan hasil scan.
-  if (scannerBox) {
-    scannerBox.classList.add(
-      "scan-active"
-    );
-  }
-
-}
-
-
-
-// =====================================================
-// KEMBALI KE MODE SIAP SCAN SETELAH 5 DETIK
-// =====================================================
-
-function aturUlangScanner() {
-
-
-  if (resetScanTimer) {
-    clearTimeout(resetScanTimer);
-  }
-
-
-  resetScanTimer =
-    setTimeout(function() {
-
-
-      const result =
-        document.getElementById(
-          "result"
-        );
-
-
-      const scannerBox =
-        document.querySelector(
-          ".scanner-box"
-        );
-
-
-      // Hilangkan hasil scan.
-      result.className =
-        "result";
-
-      result.innerHTML =
-        "";
-
-      result.style.display =
-        "none";
-
-
-      // Tampilkan kembali kamera dan frame scanner.
-      if (scannerBox) {
-        scannerBox.classList.remove(
-          "scan-active"
-        );
-      }
-
-
-      lastScannedId =
-        "";
-
-      lastScanTime =
-        0;
-
-
-      // Kamera tidak dimatikan.
-      // Hanya proses scanning yang diaktifkan kembali.
-      scanning = true;
-
-
-      if (scanAnimation) {
-        cancelAnimationFrame(
-          scanAnimation
-        );
-      }
-
-
-      scanAnimation =
-        requestAnimationFrame(
-          scanQR
-        );
-
-
-      resetScanTimer =
-        null;
-
-
-    }, 5000);
+    "block";
 
 }
 
