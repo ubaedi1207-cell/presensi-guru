@@ -2240,6 +2240,9 @@ let lastScannedId = "";
 
 let lastScanTime = 0;
 
+// Timer untuk mengembalikan scanner ke mode siap scan
+let resetScanTimer = null;
+
 
 const video =
   document.getElementById(
@@ -2268,6 +2271,11 @@ async function startCamera() {
 
 
   try {
+
+    if (resetScanTimer) {
+      clearTimeout(resetScanTimer);
+      resetScanTimer = null;
+    }
 
 
     if (videoStream) {
@@ -2528,6 +2536,15 @@ function scanQR() {
         sekarang;
 
 
+      // Hentikan scanning sementara agar hasil tetap tampil.
+      scanning = false;
+
+      if (scanAnimation) {
+        cancelAnimationFrame(scanAnimation);
+        scanAnimation = null;
+      }
+
+
       prosesPresensi(
         idGuru
       );
@@ -2637,6 +2654,9 @@ function prosesPresensi(
 
         );
 
+
+        aturUlangScanner();
+
       }
 
 
@@ -2683,6 +2703,9 @@ function prosesPresensi(
 
         );
 
+
+        aturUlangScanner();
+
       }
 
 
@@ -2706,6 +2729,9 @@ function prosesPresensi(
           )
 
         );
+
+
+        aturUlangScanner();
 
       }
 
@@ -2766,6 +2792,9 @@ function prosesPresensi(
       );
 
 
+      aturUlangScanner();
+
+
       delete window[
         callbackName
       ];
@@ -2813,6 +2842,45 @@ function showResult(
 
 }
 
+
+
+// =====================================================
+// KEMBALI KE MODE SIAP SCAN
+// =====================================================
+
+function aturUlangScanner() {
+
+  if (resetScanTimer) {
+    clearTimeout(resetScanTimer);
+  }
+
+  scanning = false;
+
+  resetScanTimer = setTimeout(function() {
+
+    const result = document.getElementById("result");
+
+    result.className = "result";
+    result.innerHTML = "";
+    result.style.display = "none";
+
+    lastScannedId = "";
+    lastScanTime = 0;
+
+    // Kamera tetap menyala; hanya proses scan yang diaktifkan lagi.
+    scanning = true;
+
+    if (scanAnimation) {
+      cancelAnimationFrame(scanAnimation);
+    }
+
+    scanAnimation = requestAnimationFrame(scanQR);
+
+    resetScanTimer = null;
+
+  }, 5000);
+
+}
 
 
 // =====================================================
