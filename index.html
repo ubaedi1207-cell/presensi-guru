@@ -2283,7 +2283,7 @@ async function startCamera() {
           video: {
 
             facingMode: {
-              ideal: "environment"
+              ideal: "user"
             }
 
           },
@@ -3284,6 +3284,118 @@ setBulanSekarang();
 checkLogin();
 
 
+</script>
+<script>
+  // =========================================================================
+  // 1. VARIABEL UTAMA & ELEMEN DOM
+  // =========================================================================
+  const video = document.getElementById('video');
+  const canvasElement = document.getElementById('canvas');
+  const canvas = canvasElement.getContext('2d');
+  const resultDiv = document.querySelector('.result');
+  
+  let isScanning = true; // Flag untuk mengontrol jeda pemindaian
+  let streamRef = null;  // Menyimpan referensi aliran kamera
+
+  // =========================================================================
+  // 2. FUNGSI AKTIVASI KAMERA DEPAN
+  // =========================================================================
+  function startCamera() {
+    isScanning = true;
+    
+    // Konfigurasi menggunakan kamera depan (facingMode: "user")
+    const constraints = {
+      video: { facingMode: "user" },
+      audio: false
+    };
+
+    navigator.mediaDevices.getUserMedia(constraints)
+      .then(function(stream) {
+        streamRef = stream;
+        video.srcObject = stream;
+        video.setAttribute("playsinline", true); // Mencegah fullscreen otomatis di iOS
+        video.play();
+        
+        // Mulai loop pemindaian gambar
+        requestAnimationFrame(tick);
+      })
+      .catch(function(err) {
+        console.error("Gagal mengakses kamera depan: ", err);
+        showResult("error", "Gagal Akses Kamera", "Pastikan izin kamera diizinkan dan perangkat memiliki kamera depan.");
+      });
+  }
+
+  // =========================================================================
+  // 3. LOOP PEMINDAIAN (TICK)
+  // =========================================================================
+  function tick() {
+    // Berhenti memproses jika sistem sedang dalam masa jeda 4 detik
+    if (!isScanning) return; 
+
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+      // Sesuaikan ukuran canvas dengan video aktif
+      canvasElement.height = video.videoHeight;
+      canvasElement.width = video.videoWidth;
+      
+      // Ambil snapshot frame video saat ini dan gambar ke canvas tersembunyi
+      canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+      const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+      
+      // Proses gambar menggunakan pustaka jsQR
+      const code = jsQR(imageData.data, imageData.width, imageData.height, {
+        inversionAttempts: "dontInvert",
+      });
+
+      // Jika QR Code berhasil terbaca
+      if (code) {
+        processAttendance(code.data);
+      }
+    }
+    
+    // Lanjutkan looping jika masih dalam mode memindai
+    if (isScanning) {
+      requestAnimationFrame(tick);
+    }
+  }
+
+  // =========================================================================
+  // 4. PROSES PRESENSI & RESET OTOMATIS 4 DETIK
+  // =========================================================================
+  function processAttendance(qrData) {
+    // Kunci pemindaian agar tidak terjadi double scan pada guru yang sama
+    isScanning = false; 
+
+    // Tampilkan data guru yang berhasil melakukan scan
+    showResult("success", "Presensi Sukses!", qrData);
+
+    // Jalankan timer otomatis untuk menutup data dalam 4 detik (4000 ms)
+    setTimeout(() => {
+      // 1. Sembunyikan elemen kotak hasil
+      resultDiv.style.display = "none";
+      resultDiv.className = "result";
+      
+      // 2. Aktifkan kembali flag pemindaian
+      isScanning = true;
+      
+      // 3. Putar kembali loop pencarian QR Code untuk guru berikutnya
+      requestAnimationFrame(tick);
+      
+      console.log("Sistem siap menerima scan guru selanjutnya...");
+    }, 4000); 
+  }
+
+  // Fungsi pembantu untuk memanipulasi elemen UI hasil (.result)
+  function showResult(type, statusText, detailText) {
+    resultDiv.style.display = "block";
+    resultDiv.className = `result ${type}`;
+    resultDiv.innerHTML = `${statusText}<div class="big">${detailText}</div>`;
+  }
+
+  // =========================================================================
+  // 5. INISIALISASI OTOMATIS (Bisa disesuaikan setelah klik tombol login)
+  // =========================================================================
+  // Panggil fungsi ini saat halaman scanner aktif / terbuka
+  startCamera();
 </script>
 
 </body>
